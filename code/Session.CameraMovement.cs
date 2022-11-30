@@ -13,7 +13,7 @@ public partial class Session
 	private const float CameraBoostSpeed = 1600.0f;
 
 	Vector2 cameraMovePreviousCursorPosition;
-	bool cameraRotating = false;
+	public bool CameraRotating { get; private set; } = false;
 	float cameraPitch = 0.0f;
 	float cameraYaw = 0.0f;
 
@@ -27,7 +27,7 @@ public partial class Session
 
 	private void StartCameraRotation()
 	{
-		cameraRotating = true;
+		CameraRotating = true;
 		Widget.Cursor = CursorShape.Blank;
 		cameraMovePreviousCursorPosition = Application.CursorPosition;
 	}
@@ -37,7 +37,7 @@ public partial class Session
 		if ( resetMouse )
 			Application.CursorPosition = cameraMovePreviousCursorPosition;
 
-		cameraRotating = false;
+		CameraRotating = false;
 		Widget.Cursor = CursorShape.None;
 	}
 
@@ -55,11 +55,16 @@ public partial class Session
 		velocity *= RealTime.Delta;
 
 		MainCamera.Position += MainCamera.Rotation * velocity;
-		OverlayCamera.Position = MainCamera.Position;
 
-		if ( !Widget.IsFocused || !cameraRotating )
+		// we might be dragging something while moving
+		if ( !velocity.AlmostEqual( 0.0f ) && !CameraRotating )
 		{
-			if ( cameraRotating )
+			EditDragMove();
+		}
+
+		if ( !Widget.IsFocused || !CameraRotating )
+		{
+			if ( CameraRotating )
 				StopCameraRotation( resetMouse: false );
 
 			return;
@@ -67,7 +72,6 @@ public partial class Session
 
 		var angle = new Angles( cameraPitch, cameraYaw, 0.0f );
 		MainCamera.Rotation = angle.ToRotation();
-		OverlayCamera.Rotation = MainCamera.Rotation;
 	}
 
 	private void ApplyCameraMoveMouse( Vector2 delta )
@@ -87,7 +91,6 @@ public partial class Session
 	public void ApplyCameraScrollWheel( WheelEvent e )
 	{
 		MainCamera.Position += MainCamera.Rotation.Forward * e.Delta / 2.0f;
-		OverlayCamera.Position = MainCamera.Position;
 	}
 
 	private void ApplyCameraKeyPress( KeyEvent e )

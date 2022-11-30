@@ -55,6 +55,48 @@ public static class IEntityExtensions
 		}
 	}
 
+	public static void SetVelocity( this IEntity ent, Vector3 velocity )
+	{
+		if ( ent is null )
+			return;
+
+		var type = ent.GetType();
+		var velocityProp = type.GetProperty( "Velocity", BindingFlags.Instance | BindingFlags.Public );
+
+		if ( velocityProp is null )
+			return;
+
+		try
+		{
+			velocityProp.SetValue( ent, velocity );
+		}
+		catch ( NullReferenceException nre )
+		{
+			Log.Error( nre );
+		}
+	}
+
+	public static void ResetInterpolation( this IEntity ent )
+	{
+		if ( ent is null )
+			return;
+
+		var type = ent.GetType();
+		var resetMethod = type.GetMethod( "ResetInterpolation", BindingFlags.Instance | BindingFlags.Public );
+
+		if ( resetMethod is null )
+			return;
+
+		try
+		{
+			resetMethod.Invoke( ent, null );
+		}
+		catch ( NullReferenceException nre )
+		{
+			Log.Error( nre );
+		}
+	}
+
 	private static Dictionary<IEntity, IEntity> ClientToServer = new();
 
 	public static IEntity GetServerEntity( this IEntity clientEntity )

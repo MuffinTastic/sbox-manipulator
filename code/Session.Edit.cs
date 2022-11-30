@@ -21,79 +21,76 @@ public partial class Session
 
 	private void EditMouseClick( MouseEvent e )
 	{
-		var tr = RunMouseTrace();
-		if ( tr.Hit )
+		if ( CameraRotating )
+			return;
+
+		if ( e.LeftMouseButton )
 		{
-			var obj = new SceneModel( OverlayWorld, Model.Load( "models/arrow.vmdl" ), Transform.Zero );
-			obj.Position = tr.HitPosition;
-
-			var up = Vector3.Up;
-
-			// We have to use a different "up" to calculate the bitangent if we're
-			// on the ceiling or floor.
-			// Use the direction of the trace, it goes straight back to the player
-
-			if ( tr.Normal.AlmostEqual( Vector3.Up ) )
-				up = tr.Direction;
-			else if ( tr.Normal.AlmostEqual( Vector3.Down ) )
-				up = -tr.Direction;
-
-			var tangent = up.Cross( tr.Normal ).Normal;
-			var bitangent = tr.Normal.Cross( tangent ).Normal;
-
-			obj.Rotation = Rotation.LookAt( bitangent, tr.Normal );
-
-			async void DeleteLater( SceneModel obj )
+			if ( Gizmo.IsDragging )
 			{
-				await Task.Delay( 1000 );
-				obj.Delete();
-				testmodels.Remove( obj );
+				return;
 			}
 
-			DeleteLater( obj );
-			testmodels.Add( obj );
+			var tr = RunTrace( GetCursorRay() );
+			if ( tr.Hit )
+			{
+				// SpawnDebugArrow( tr );
 
-			if ( e.HasShift )
-			{
-				Selection.Add( tr.Entity );
-			}
-			else if ( e.HasCtrl )
-			{
-				Selection.Remove( tr.Entity );
-			}
-			else
-			{
-				Selection.Set( tr.Entity );
-			}
+				if ( e.HasShift )
+				{
+					Selection.Add( tr.Entity );
+				}
+				else if ( e.HasCtrl )
+				{
+					Selection.Remove( tr.Entity );
+				}
+				else
+				{
+					Selection.Set( tr.Entity );
+				}
 
-			Selection.SetEditorInspector();
+				Selection.SetEditorInspector();
+			}
 		}
 	}
 
-	private void StartEditDrag( Vector2 position )
+	private bool StartEditDrag()
 	{
-		//Gizmo.StartDrag( )
+		if ( CameraRotating )
+			return false;
+
+		return Gizmo.StartDrag( GetCursorRay() );
 	}
 
-	private void EditDragMove( Vector2 position, Vector2 delta )
+	private void EditDragMove()
 	{
+		if ( CameraRotating )
+			return;
 
+		Gizmo.UpdateDrag( GetCursorRay() );
 	}
 
-	private void StopEditDrag( Vector2 position )
+	private void StopEditDrag()
 	{
+		if ( CameraRotating )
+			return;
 
+		Gizmo.StopDrag( GetCursorRay() );
 	}
 
 	private void UpdateEdit()
 	{
-		var tr = RunMouseTrace();
-
 		HoverEntity = null;
 
-		if ( tr.Hit && !cameraRotating )
+		var ray = GetCursorRay();
+		if ( !Gizmo.IsHovering( ray ) && !CameraRotating )
 		{
-			HoverEntity = tr.Entity;
+			var tr = RunTrace( ray );
+
+			if ( tr.Hit && !CameraRotating )
+			{
+				HoverEntity = tr.Entity;
+			}
 		}
 
 		HoverOutlines.UpdateFrom( HoverEntity );
@@ -102,12 +99,49 @@ public partial class Session
 		Gizmo.Update();
 	}
 
-	private GameTraceResult RunMouseTrace()
+	private void EditHandleKeyPress( KeyEvent e )
 	{
-		var ray = GetCursorRay();
+		if ( e.Key == KeyCode.R )
+			Gizmo.ToggleLocal();
+	}
+
+	private GameTraceResult RunTrace( Ray ray )
+	{
 		var tr = GameTrace.Ray( ray.Origin, ray.Origin + ray.Direction * 1000.0f, client: true )
 			.WorldAndEntities()
 			.Run();
 		return tr;
+	}
+
+	private void SpawnDebugArrow( GameTraceResult tr )
+	{
+		var obj = new SceneModel( MainWorld, Model.Load( "models/arrow.vmdl" ), Transform.Zero );
+		obj.Position = tr.HitPosition;
+
+		var up = Vector3.Up;
+
+		// We have to use a different "up" to calculate the bitangent if we're
+		// on the ceiling or floor.
+		// Use the direction of the trace, it goes straight back to the player
+
+		if ( tr.Normal.AlmostEqual( Vector3.Up ) )
+			up = tr.Direction;
+		else if ( tr.Normal.AlmostEqual( Vector3.Down ) )
+			up = -tr.Direction;
+
+		var tangent = up.Cross( tr.Normal ).Normal;
+		var bitangent = tr.Normal.Cross( tangent ).Normal;
+
+		obj.Rotation = Rotation.LookAt( bitangent, tr.Normal );
+
+		async void DeleteLater( SceneModel obj )
+		{
+			await Task.Delay( 1000 );
+			obj.Delete();
+			testmodels.Remove( obj );
+		}
+
+		DeleteLater( obj );
+		testmodels.Add( obj );
 	}
 }

@@ -110,7 +110,7 @@ public class Selection : IValid
 		}
 	}
 
-	private void RebuildTransforms()
+	public void RebuildTransforms()
 	{
 		LocalTransforms.Clear();
 
@@ -119,16 +119,16 @@ public class Selection : IValid
 			return;
 		}
 
-		var average = Vector3.Zero;
+		var averagePosition = Vector3.Zero;
 
 		foreach ( var entity in SelectedEntities )
 		{
-			average += entity.Transform.Position;
+			averagePosition += entity.Transform.Position;
 		}
 
-		average /= SelectedEntities.Count;
+		averagePosition /= SelectedEntities.Count;
 		
-		_position = average;
+		_position = averagePosition;
 		_rotation = Rotation.Identity;
 		var selectionTransform = new Transform( _position, _rotation );
 
@@ -146,9 +146,10 @@ public class Selection : IValid
 		{
 			var entity = pair.Item1;
 			var localTransform = pair.Item2;
-
+			
 			var worldTransform = selectionTransform.ToWorld( localTransform );
 			entity.SetTransform( worldTransform );
+			entity.ResetInterpolation();
 		}
 	}
 }

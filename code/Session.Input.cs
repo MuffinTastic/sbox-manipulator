@@ -12,6 +12,26 @@ namespace Manipulator;
 
 public partial class Session
 {
+	bool leftClickPressed;
+	bool rightClickPressed;
+
+	enum DragButton
+	{
+		None, Left, Right
+	}
+
+	private DragButton GetDragButton( bool left, bool right )
+	{
+		if ( left )
+			return DragButton.Left;
+
+		if ( right )
+			return DragButton.Right;
+
+		return DragButton.None;
+	}
+
+	DragButton dragButton;
 	bool pressIsClick;
 	bool pressIsLeftClick;
 	bool pressIsRightClick;
@@ -21,12 +41,28 @@ public partial class Session
 
 	public void OnMousePress( MouseEvent e )
 	{
-		if ( true /* todo: not interacting with gizmos */ )
+		if ( e.LeftMouseButton )
+			leftClickPressed = true;
+		if ( e.RightMouseButton )
+			rightClickPressed = true;
+
+		if ( dragButton == DragButton.None )
 		{
-			pressStart = e.LocalPosition;
-			pressIsClick = true; // assume it's a click
-			pressIsLeftClick = e.LeftMouseButton;
-			pressIsRightClick = e.RightMouseButton;
+			bool startPress = true;
+
+			if ( e.LeftMouseButton )
+			{
+				if ( StartEditDrag() )
+					startPress = false;
+			}
+
+			if ( startPress )
+			{
+				pressStart = e.LocalPosition;
+				pressIsClick = true; // assume it's a click
+				pressIsLeftClick = e.LeftMouseButton;
+				pressIsRightClick = e.RightMouseButton;
+			}
 		}
 	}
 
@@ -34,16 +70,15 @@ public partial class Session
 	{
 		var delta = lastMousePosition - e.LocalPosition;
 
-		if ( pressIsClick )
+		if ( pressIsClick && ( leftClickPressed || rightClickPressed ) )
 		{
 			// we went out of range, it's not a click
 			if ( e.LocalPosition.Distance( pressStart ) > pressFuzz )
 			{
 				pressIsClick = false;
+				dragButton = GetDragButton( pressIsLeftClick, pressIsRightClick );
 
-				if ( pressIsLeftClick )
-					StartEditDrag( e.LocalPosition );
-				else if ( pressIsRightClick )
+				if ( pressIsRightClick && !Gizmo.IsDragging )
 					StartCameraRotation();
 			}
 
@@ -52,36 +87,43 @@ public partial class Session
 		}
 		else
 		{
-			if ( pressIsLeftClick )
-			{
-				EditDragMove( e.LocalPosition, delta );
-			}
-			else if ( pressIsRightClick && cameraRotating )
+			if ( pressIsRightClick && CameraRotating )
 			{
 				ApplyCameraMoveMouse( delta );
 			}
 		}
+
+		EditDragMove();
 
 		lastMousePosition = e.LocalPosition;
 	}
 
 	public void OnMouseReleased( MouseEvent e )
 	{
+		if ( e.LeftMouseButton )
+			leftClickPressed = false;
+		if ( e.RightMouseButton )
+			rightClickPressed = false;
+
 		if ( pressIsClick )
 		{
 			EditMouseClick( e );
 		}
 		else
 		{
-			if ( e.LeftMouseButton )
-			{
-				StopEditDrag( e.LocalPosition );
-			}
-			else if ( e.RightMouseButton )
-			{
-				if ( cameraRotating )
-					StopCameraRotation();
-			}
+			if ( dragButton == GetDragButton( e.LeftMouseButton, e.RightMouseButton ) )
+				dragButton = DragButton.None;
+		}
+
+		if ( e.LeftMouseButton )
+		{
+			StopEditDrag();
+		}
+
+		if ( e.RightMouseButton )
+		{
+			if ( CameraRotating )
+				StopCameraRotation();
 		}
 	}
 
@@ -93,6 +135,7 @@ public partial class Session
 	public void OnKeyPress( KeyEvent e )
 	{
 		ApplyCameraKeyPress( e );
+		EditHandleKeyPress( e );
 	}
 
 	public void OnKeyRelease( KeyEvent e )
@@ -106,12 +149,13 @@ public partial class Session
 		return new Ray( MainCamera.Position, direction );
 	}
 
-	public Vector2? Project( Vector3 position )
+	public void SnapMouseToWorld( Vector3 position )
 	{
 		var screenPos = Screen.ProjectFromWorld( position, FOV, new Transform( MainCamera.Position, MainCamera.Rotation ), Widget.ContentRect.Size );
 
-		// validation?
-
-		return screenPos;
+		if ( screenPos is Vector2 pos )
+		{
+			Application.CursorPosition = Widget.ScreenPosition + pos;
+		}
 	}
 }
