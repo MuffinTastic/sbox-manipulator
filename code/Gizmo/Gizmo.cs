@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Sandbox;
 using Tools;
 
-namespace Manipulator;
+namespace Manipulator.Gizmo;
 
 public abstract class Gizmo : IDisposable
 {
@@ -184,9 +184,9 @@ public abstract class Gizmo : IDisposable
 		switch ( axis )
 		{
 			case Axis.Camera:
-			case Axis.X: return new Vector2( -point.z,  point.y );
+			case Axis.X: return new Vector2( -point.z, point.y );
 			case Axis.Y: return new Vector2( -point.z, -point.x );
-			case Axis.Z: return new Vector2(  point.x,  point.y );
+			case Axis.Z: return new Vector2( point.x, point.y );
 		}
 
 		return Vector2.Zero;
@@ -225,83 +225,6 @@ public abstract class Gizmo : IDisposable
 		}
 	}
 
-	public abstract class SubGizmo : IDisposable
-	{
-		protected static Material Override = Material.Load( "materials/mnp_override.vmat" );
-		protected static Material OverrideNoCull = Material.Load( "materials/mnp_override_nocull.vmat" );
-
-		protected const float GizmoSize = 16.0f;
-		protected const float FinalScale = 0.15f;
-		protected const float RenderSize = (1.0f / GizmoSize) * FinalScale;
-		protected const float Gap = 0.2f * FinalScale;
-		protected const float Width = 0.1f * FinalScale;
-		protected const float Length = 1.0f * FinalScale;
-
-		protected readonly Gizmo Parent;
-		protected readonly Axis Axis;
-
-		protected BBox bbox;
-		protected Plane plane;
-
-		protected SceneModel sceneModel;
-
-		public SubGizmo( Gizmo parent, Axis axis, string modelName )
-		{
-			Parent = parent;
-			Axis = axis;
-
-			sceneModel = new SceneModel( parent.Session.MainWorld, modelName, Transform.Zero );
-			sceneModel.RenderingEnabled = false;
-		}
-
-		public void Dispose()
-		{
-			sceneModel.Delete();
-		}
-
-		public abstract void Update();
-		public abstract void UpdateDrag( Ray ray );
-		public abstract void Render( Session session );
-		public abstract bool Intersects( Ray ray );
-
-		public virtual void StartDrag()
-		{
-			var origin = Parent.Selection.Position;
-			plane = GetAppropriatePlaneForAxis( origin );
-		}
-
-		public abstract Plane GetAppropriatePlaneForAxis( Vector3 origin );
-
-		public virtual Color GetGizmoColor()
-		{
-			var ray = Parent.Session.GetCursorRay();
-			var intersects = Parent.IsHovering( ray, this );
-			
-			if ( Parent.Dragged == this || intersects )
-				return Color.Yellow;
-
-			var color = Color.Black;
-
-			switch ( Axis )
-			{
-				case Axis.X: color = new Vector3( 1.0f, 0.0f, 0.0f ); break;
-				case Axis.Y: color = new Vector3( 0.0f, 1.0f, 0.0f ); break;
-				case Axis.Z: color = new Vector3( 0.0f, 0.0f, 1.0f ); break;
-				case Axis.Camera: color = new Vector3( 1.0f, 1.0f, 1.0f ); break;
-			}
-
-			if ( Parent.Local )
-			{
-				if ( Axis == Axis.Z )
-					color = new Vector3( 0.5f, 0.0f, 1.0f );
-
-				color = color.Desaturate( 0.1f );
-			}
-
-			return color;
-		}
-	}
-
 	protected virtual void Dispose( bool disposing )
 	{
 		if ( !disposedValue )
@@ -323,8 +246,8 @@ public abstract class Gizmo : IDisposable
 	// TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
 	~Gizmo()
 	{
-	    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
-	    Dispose(disposing: false);
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose( disposing: false );
 	}
 
 	public void Dispose()
