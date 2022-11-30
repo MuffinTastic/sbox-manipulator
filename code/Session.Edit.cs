@@ -102,7 +102,11 @@ public partial class Session
 	private void EditHandleKeyPress( KeyEvent e )
 	{
 		if ( e.Key == KeyCode.R )
+		{
 			Gizmo.ToggleLocal();
+
+			Gizmo.UpdateDrag( GetCursorRay() );
+		}
 	}
 
 	private GameTraceResult RunTrace( Ray ray )

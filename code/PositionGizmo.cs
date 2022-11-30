@@ -18,9 +18,9 @@ public class PositionGizmo : Gizmo
 			new AxisGizmo( this, Axis.X ),
 			new AxisGizmo( this, Axis.Y ),
 			new AxisGizmo( this, Axis.Z ),
-			//new PlaneGizmo( this, Axis.X ),
-			//new PlaneGizmo( this, Axis.Y ),
-			//new PlaneGizmo( this, Axis.Z )
+			new PlaneGizmo( this, Axis.X ),
+			new PlaneGizmo( this, Axis.Y ),
+			new PlaneGizmo( this, Axis.Z )
 		};
 	}
 
@@ -58,7 +58,6 @@ public class PositionGizmo : Gizmo
 		public override void UpdateDrag( Ray ray )
 		{
 			var transform = Parent.GetDragTransform();
-			//ray = transform.RayToLocal( ray );
 
 			Vector3 point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
 
@@ -68,16 +67,8 @@ public class PositionGizmo : Gizmo
 
 		public override void Render( Session session )
 		{
-			var ray = session.GetCursorRay();
-
-			var intersects = Parent.IsHovering( ray, this );
-
-			var color = Parent.AxisToColor( Axis );
-			if ( Parent.Dragged == this || intersects )
-				color = Color.Yellow;
-
+			var color = GetGizmoColor();
 			var transform = Parent.GetSelectionTransform();
-
 			var scale = Parent.GetCameraAdjustedScale();
 
 			var renderTransform = new Transform(
@@ -155,20 +146,13 @@ public class PositionGizmo : Gizmo
 
 		public override void Render( Session session )
 		{
-			var ray = session.GetCursorRay();
-
-			var intersects = Parent.IsHovering( ray, this );
-
-			var color = Parent.AxisToColor( Axis );
-			if ( Parent.Dragged == this || intersects )
-				color = Color.Yellow;
+			var color = GetGizmoColor();
 
 			var direction = GetAppropriateAxisDirection();
 			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Left : Vector3.Up;
 			var rot = Rotation.LookAt( direction, up );
 
 			var transform = Parent.GetSelectionTransform();
-
 			var scale = Parent.GetCameraAdjustedScale();
 
 			var renderTransform = new Transform(
@@ -258,10 +242,13 @@ public class PositionGizmo : Gizmo
 		}
 	}
 
-	/*
+	// ------------------------------------------------ //
+
 	private class PlaneGizmo : SubGizmo
 	{
-		public PlaneGizmo( Gizmo parent, Axis axis ) : base( parent, axis )
+		const float PlaneGizmoSize = 12.0f;
+
+		public PlaneGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_plane.vmdl" )
 		{
 
 		}
@@ -270,88 +257,112 @@ public class PositionGizmo : Gizmo
 		{
 			Vector3 corner1, corner2;
 
-			if ( Axis == Axis.Camera )
-			{
-				corner1 = new Vector3( -Width );
-				corner2 = new Vector3( Width );
-			}
-			else
-			{
-				var direction = GetAppropriateAxisDirection( Parent.Selection.Position );
-				var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Left : Vector3.Up;
-				var rot = Rotation.LookAt( direction, up );
+			var direction = Parent.AxisToVector( Axis );
+			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Forward : Vector3.Up;
+			var rot = Rotation.LookAt( direction, up );
 
-				corner1 = rot.Forward * (Width + Gap) + (rot.Right + rot.Down) * Width;
-				corner2 = rot.Forward * Length + (rot.Left + rot.Up) * Width;
-			}
+			var transform = Parent.GetSelectionTransform();
 
+			var camera = Parent.Session.MainCamera.Position;
+			var offset = SnapInQuadrant( camera );
+
+			var center = offset * (1.0f / PlaneGizmoSize);
+
+			corner1 = center + (rot.Left + rot.Up) * Gap;
+			corner2 = center + (rot.Right + rot.Down) * Gap;
+			
 			var scale = Parent.GetCameraAdjustedScale();
 			corner1 *= scale;
 			corner2 *= scale;
-
-			corner1 += Parent.Selection.Position;
-			corner2 += Parent.Selection.Position;
 
 			Vector3.Sort( ref corner1, ref corner2 );
 			bbox = new BBox( corner1, corner2 );
 		}
 
+		public override void StartDrag()
+		{
+			base.StartDrag();
+
+			Parent.Session.SnapMouseToWorld( Parent.GetSelectionTransform().Position );
+		}
+
 		public override void UpdateDrag( Ray ray )
 		{
-			Vector3 delta = plane.Trace( ray, twosided: true ).GetValueOrDefault() - Parent.Selection.Position;
+			var transform = Parent.GetDragTransform();
+			ray = transform.RayToLocal( ray );
 
-			if ( Axis != Axis.Camera )
-			{
-				var axisVector = Parent.AxisToVector( Axis );
-				delta = axisVector.Dot( delta ) * axisVector;
-			}
+			Vector3 point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
 
-			var newPosition = Parent.Selection.Position + delta;
-			Parent.Move( newPosition, Parent.Selection.Rotation );
+			var newPosition = transform.PointToWorld( point );
+			Parent.Move( newPosition, transform.Rotation );
 		}
 
 		public override void Render( Session session )
 		{
-			var ray = session.GetCursorRay();
+			var color = GetGizmoColor();
 
-			var intersects = Parent.IsHovering( ray, this );
+			var direction = Parent.AxisToVector( Axis );
+			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Forward : Vector3.Up;
+			var rot = Rotation.LookAt( direction, up );
 
-			List<Vertex> bboxVertices = new();
-			List<ushort> bboxIndices = new();
+			var transform = Parent.GetSelectionTransform();
+			var scale = Parent.GetCameraAdjustedScale();
 
-			var color = Parent.AxisToColor( Axis );
-			if ( Parent.Dragged == this || intersects )
-				color = Color.Yellow;
+			var camera = Parent.Session.MainCamera.Position;
+			var offset = SnapInQuadrant( camera );
 
-			Outlines.BuildLines( bbox.Corners, ref bboxVertices, ref bboxIndices, color );
+			var renderTransform = new Transform(
+				transform.Position + (transform.Rotation * offset * (1.0f / PlaneGizmoSize) * scale ),
+				transform.Rotation * rot,
+				RenderSize * scale
+			);
 
-			Graphics.Draw( bboxVertices.ToArray(), bboxVertices.Count,
-				bboxIndices.ToArray(), bboxIndices.Count,
-				Outlines.Material, primitiveType: Graphics.PrimitiveType.Lines );
+			sceneModel.Transform = renderTransform;
+
+			Graphics.Render( sceneModel, null, color, Override );
 		}
 
 		public override bool Intersects( Ray ray )
 		{
+			var transform = Parent.GetSelectionTransform();
+			ray = transform.RayToLocal( ray );
 			return bbox.Intersection( ray, out var _, out var _ );
 		}
 
-		public Vector3 GetAppropriateGizmoOffset( Vector3 origin )
+		public Vector3 SnapInQuadrant( Vector3 world )
 		{
-			var point = plane.SnapToPlane( origin );
+			var local = Parent.SnapToPlaneLocal( Axis, world );
 
-			// snap point to a quadrant
-			var snapped = 
+			if ( !local.x.AlmostEqual( 0.0f ) )
+			{
+				if ( local.x > 0.0f )
+					local.x = 1.0f;
+				else
+					local.x = -1.0f;
+			}
+
+			if ( !local.y.AlmostEqual( 0.0f ) )
+			{
+				if ( local.y > 0.0f )
+					local.y = 1.0f;
+				else
+					local.y = -1.0f;
+			}
+
+			if ( !local.z.AlmostEqual( 0.0f ) )
+			{
+				if ( local.z > 0.0f )
+					local.z = 1.0f;
+				else
+					local.z = -1.0f;
+			}
+
+			return local;
 		}
 
 		public override Plane GetAppropriatePlaneForAxis( Vector3 origin )
 		{
-			if ( Axis == Axis.Camera )
-			{
-				return Parent.GetCameraAlignedPlane( origin );
-			}
-
-			Vector3 planeNormal = Parent.AxisToVector( Axis );
-			return new Plane( origin, planeNormal );
+			return new Plane( Vector3.Zero, Parent.AxisToVector( Axis ) );
 		}
-	}*/
+	}
 }

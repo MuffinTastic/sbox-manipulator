@@ -10,7 +10,7 @@ using Tools;
 
 namespace Manipulator;
 
-public abstract class Gizmo
+public abstract class Gizmo : IDisposable
 {
 	public enum Axis
 	{
@@ -24,6 +24,7 @@ public abstract class Gizmo
 	public bool IsDragging => Dragged is not null;
 
 	protected SubGizmo[] SubGizmos;
+	private bool disposedValue;
 
 	public Transform DragStartTransform { get; private set; }
 	public SubGizmo Dragged { get; private set; }
@@ -44,14 +45,14 @@ public abstract class Gizmo
 
 		Dragged = SubGizmos.FirstOrDefault( g => g.Intersects( ray ) );
 
-		if ( Dragged is not null )
+		if ( IsDragging )
 		{
 			DragStartTransform = GetSelectionTransform();
 
 			Dragged.StartDrag();
 		}
 
-		return Dragged is not null;
+		return IsDragging;
 	}
 
 	public void UpdateDrag( Ray ray )
@@ -73,6 +74,11 @@ public abstract class Gizmo
 	public void ToggleLocal()
 	{
 		Local = !Local;
+
+		if ( IsDragging )
+		{
+			DragStartTransform = GetSelectionTransform();
+		}
 	}
 
 	public bool IsHovering( Ray ray )
@@ -150,6 +156,42 @@ public abstract class Gizmo
 		return localPos.x;
 	}
 
+	public Vector3 SnapToPlaneLocal( Axis axis, Vector3 point )
+	{
+		var transform = GetSelectionTransform();
+		point = transform.PointToLocal( point );
+
+		Vector3 planeNormal = AxisToVector( axis );
+		var plane = new Plane( Vector3.Zero, planeNormal );
+
+		return plane.SnapToPlane( point );
+	}
+
+	public Vector2 TraceToPlaneLocal( Axis axis, Ray ray )
+	{
+		var transform = GetSelectionTransform();
+
+		Vector3 planeNormal = AxisToVector( axis );
+		var plane = new Plane( transform.Position, planeNormal );
+
+		var point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
+		point -= transform.Position;
+
+		var rot = axis == Axis.Camera ?
+			Session.MainCamera.Rotation : transform.Rotation;
+		point = rot.Inverse * point;
+
+		switch ( axis )
+		{
+			case Axis.Camera:
+			case Axis.X: return new Vector2( -point.z,  point.y );
+			case Axis.Y: return new Vector2( -point.z, -point.x );
+			case Axis.Z: return new Vector2(  point.x,  point.y );
+		}
+
+		return Vector2.Zero;
+	}
+
 	public Vector3 AxisToVector( Axis axis )
 	{
 		switch ( axis )
@@ -161,76 +203,6 @@ public abstract class Gizmo
 		}
 
 		return Vector3.Zero;
-	}
-
-	public Color AxisToColor( Axis axis )
-	{
-		var color = Color.Black;
-
-		switch ( axis )
-		{
-			case Axis.X: color = new Vector3( 1.0f, 0.0f, 0.0f ); break;
-			case Axis.Y: color = new Vector3( 0.0f, 1.0f, 0.0f ); break;
-			case Axis.Z: color = new Vector3( 0.0f, 0.0f, 1.0f ); break;
-			case Axis.Camera: color = new Vector3( 1.0f, 1.0f, 1.0f ); break;
-		}
-
-		if ( Local )
-		{
-			if ( axis == Axis.Z )
-				color = new Vector3( 0.5f, 0.0f, 1.0f );
-			
-			color = color.Desaturate( 0.1f );
-		}
-
-		return color;
-	}
-
-	public Vector2 SnapToPlaneLocal( Axis axis, Vector3 point )
-	{
-		point -= Selection.Position;
-
-		Vector3 planeNormal = AxisToVector( axis );
-		var plane = new Plane( Vector3.Zero, planeNormal );
-
-		var rot = axis == Axis.Camera ?
-			Session.MainCamera.Rotation : GetSelectionTransform().Rotation;
-		point = rot.Inverse * point;
-
-		point = plane.SnapToPlane( point );
-
-		switch ( axis )
-		{
-			case Axis.Camera:
-			case Axis.X: return new Vector2( -point.z,  point.y );
-			case Axis.Y: return new Vector2( -point.z, -point.x );
-			case Axis.Z: return new Vector2(  point.x,  point.y );
-		}
-
-		return Vector2.Zero;
-	}
-
-	public Vector2 TraceToPlaneLocal( Axis axis, Ray ray )
-	{
-		Vector3 planeNormal = AxisToVector( axis );
-		var plane = new Plane( Selection.Position, planeNormal );
-
-		var point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
-		point -= Selection.Position;
-
-		var rot = axis == Axis.Camera ?
-			Session.MainCamera.Rotation : GetSelectionTransform().Rotation;
-		point = rot.Inverse * point;
-
-		switch ( axis )
-		{
-			case Axis.Camera:
-			case Axis.X: return new Vector2( -point.z,  point.y );
-			case Axis.Y: return new Vector2( -point.z, -point.x );
-			case Axis.Z: return new Vector2(  point.x,  point.y );
-		}
-
-		return Vector2.Zero;
 	}
 
 	public Transform GetDragTransform()
@@ -261,7 +233,7 @@ public abstract class Gizmo
 		protected const float FinalScale = 0.15f;
 		protected const float RenderSize = (1.0f / GizmoSize) * FinalScale;
 		protected const float Gap = 0.2f * FinalScale;
-		protected const float Width = 0.2f * FinalScale;
+		protected const float Width = 0.1f * FinalScale;
 		protected const float Length = 1.0f * FinalScale;
 
 		protected readonly Gizmo Parent;
@@ -298,5 +270,66 @@ public abstract class Gizmo
 		}
 
 		public abstract Plane GetAppropriatePlaneForAxis( Vector3 origin );
+
+		public virtual Color GetGizmoColor()
+		{
+			var ray = Parent.Session.GetCursorRay();
+			var intersects = Parent.IsHovering( ray, this );
+			
+			if ( Parent.Dragged == this || intersects )
+				return Color.Yellow;
+
+			var color = Color.Black;
+
+			switch ( Axis )
+			{
+				case Axis.X: color = new Vector3( 1.0f, 0.0f, 0.0f ); break;
+				case Axis.Y: color = new Vector3( 0.0f, 1.0f, 0.0f ); break;
+				case Axis.Z: color = new Vector3( 0.0f, 0.0f, 1.0f ); break;
+				case Axis.Camera: color = new Vector3( 1.0f, 1.0f, 1.0f ); break;
+			}
+
+			if ( Parent.Local )
+			{
+				if ( Axis == Axis.Z )
+					color = new Vector3( 0.5f, 0.0f, 1.0f );
+
+				color = color.Desaturate( 0.1f );
+			}
+
+			return color;
+		}
+	}
+
+	protected virtual void Dispose( bool disposing )
+	{
+		if ( !disposedValue )
+		{
+			if ( disposing )
+			{
+				foreach ( var gizmo in SubGizmos )
+				{
+					gizmo.Dispose();
+				}
+			}
+
+			// TODO: free unmanaged resources (unmanaged objects) and override finalizer
+			// TODO: set large fields to null
+			disposedValue = true;
+		}
+	}
+
+	// TODO: override finalizer only if 'Dispose(bool disposing)' has code to free unmanaged resources
+	~Gizmo()
+	{
+	    // Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+	    Dispose(disposing: false);
+	}
+
+	public void Dispose()
+	{
+		// Do not change this code. Put cleanup code in 'Dispose(bool disposing)' method
+		Dispose( disposing: true );
+		GC.SuppressFinalize( this );
 	}
 }
