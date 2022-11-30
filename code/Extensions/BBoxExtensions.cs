@@ -4,14 +4,14 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Manipulator;
+namespace Manipulator.Extensions;
 
 public static class BBoxExtensions
 {
 	public static bool Intersection( this BBox box, Ray r, out Vector3 point1, out Vector3 point2 )
 	{
-		var min = (box.Center - (box.Size / 2)) - r.Origin;
-		var max = (box.Center + (box.Size / 2)) - r.Origin;
+		var min = box.Center - box.Size / 2 - r.Origin;
+		var max = box.Center + box.Size / 2 - r.Origin;
 		float near = float.MinValue;
 		float far = float.MaxValue;
 
