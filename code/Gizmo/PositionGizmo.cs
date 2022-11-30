@@ -1,13 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using Manipulator.Extensions;
-using Sandbox;
-
-namespace Manipulator.Gizmo;
+﻿namespace Manipulator.Gizmo;
 
 public partial class PositionGizmo : Gizmo
 {
