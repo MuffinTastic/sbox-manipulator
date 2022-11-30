@@ -151,7 +151,7 @@ public abstract class Gizmo : IDisposable
 	public float GetCameraAdjustedScale()
 	{
 		var pos = Selection.Position;
-		var transform = new Transform( Session.MainCamera.Position, Session.MainCamera.Rotation );
+		var transform = new Transform( Session.Camera.Position, Session.Camera.Rotation );
 		var localPos = transform.PointToLocal( pos );
 		return localPos.x;
 	}
@@ -178,7 +178,7 @@ public abstract class Gizmo : IDisposable
 		point -= transform.Position;
 
 		var rot = axis == Axis.Camera ?
-			Session.MainCamera.Rotation : transform.Rotation;
+			Session.Camera.Rotation : transform.Rotation;
 		point = rot.Inverse * point;
 
 		switch ( axis )
@@ -199,7 +199,7 @@ public abstract class Gizmo : IDisposable
 			case Axis.X: return new Vector3( 1.0f, 0.0f, 0.0f );
 			case Axis.Y: return new Vector3( 0.0f, 1.0f, 0.0f );
 			case Axis.Z: return new Vector3( 0.0f, 0.0f, 1.0f );
-			case Axis.Camera: return Session.MainCamera.Rotation.Forward;
+			case Axis.Camera: return Session.Camera.Rotation.Forward;
 		}
 
 		return Vector3.Zero;

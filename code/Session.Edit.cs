@@ -119,7 +119,7 @@ public partial class Session
 
 	private void SpawnDebugArrow( GameTraceResult tr )
 	{
-		var obj = new SceneModel( MainWorld, Model.Load( "models/arrow.vmdl" ), Transform.Zero );
+		var obj = new SceneModel( SceneWorld, Model.Load( "models/arrow.vmdl" ), Transform.Zero );
 		obj.Position = tr.HitPosition;
 
 		var up = Vector3.Up;

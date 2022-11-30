@@ -54,7 +54,7 @@ public partial class Session
 		velocity *= cameraBoostPressed ? CameraBoostSpeed : CameraDefaultSpeed;
 		velocity *= RealTime.Delta;
 
-		MainCamera.Position += MainCamera.Rotation * velocity;
+		Camera.Position += Camera.Rotation * velocity;
 
 		// we might be dragging something while moving
 		if ( !velocity.AlmostEqual( 0.0f ) && !CameraRotating )
@@ -71,7 +71,7 @@ public partial class Session
 		}
 
 		var angle = new Angles( cameraPitch, cameraYaw, 0.0f );
-		MainCamera.Rotation = angle.ToRotation();
+		Camera.Rotation = angle.ToRotation();
 	}
 
 	private void ApplyCameraMoveMouse( Vector2 delta )
@@ -90,7 +90,7 @@ public partial class Session
 
 	public void ApplyCameraScrollWheel( WheelEvent e )
 	{
-		MainCamera.Position += MainCamera.Rotation.Forward * e.Delta / 2.0f;
+		Camera.Position += Camera.Rotation.Forward * e.Delta / 2.0f;
 	}
 
 	private void ApplyCameraKeyPress( KeyEvent e )

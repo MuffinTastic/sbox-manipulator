@@ -30,7 +30,7 @@ public abstract class SubGizmo : IDisposable
 		Parent = parent;
 		Axis = axis;
 
-		sceneModel = new SceneModel( parent.Session.MainWorld, modelName, Transform.Zero );
+		sceneModel = new SceneModel( parent.Session.SceneWorld, modelName, Transform.Zero );
 		sceneModel.RenderingEnabled = false;
 	}
 

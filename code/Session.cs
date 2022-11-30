@@ -13,8 +13,8 @@ public partial class Session : RenderHook, IDisposable, IValid
 
 	public Widget Widget { get; init; }
 	
-	public SceneWorld MainWorld { get; init; }
-	public SceneCamera MainCamera { get; private set; }
+	public SceneWorld SceneWorld { get; init; }
+	public SceneCamera Camera { get; private set; }
 
 	private List<SceneModel> testmodels = new();
 
@@ -23,19 +23,19 @@ public partial class Session : RenderHook, IDisposable, IValid
 	public Session( Widget parent, SceneWorld sceneWorld )
 	{
 		Widget = parent;
-		MainWorld = sceneWorld;
+		SceneWorld = sceneWorld;
 
 
-		MainCamera = new SceneCamera( "Manipulator Main Camera" );
-		MainCamera.World = MainWorld;
+		Camera = new SceneCamera( "Manipulator Main Camera" );
+		Camera.World = SceneWorld;
 
-		MainCamera.ZFar = 10000;
-		MainCamera.AntiAliasing = true;
-		MainCamera.EnablePostProcessing = true;
-		MainCamera.BackgroundColor = Color.Black;
+		Camera.ZFar = 10000;
+		Camera.AntiAliasing = true;
+		Camera.EnablePostProcessing = true;
+		Camera.BackgroundColor = Color.Black;
 
 		// Session
-		MainCamera.AddHook( this );
+		Camera.AddHook( this );
 
 		Gizmo = new PositionGizmo( this, Selection );
 
@@ -44,8 +44,8 @@ public partial class Session : RenderHook, IDisposable, IValid
 
 	public void Dispose()
 	{
-		MainCamera?.RemoveAllHooks();
-		MainCamera = null;
+		Camera?.RemoveAllHooks();
+		Camera = null;
 
 		foreach ( var model in testmodels )
 		{
@@ -58,7 +58,7 @@ public partial class Session : RenderHook, IDisposable, IValid
 		var Aspect = Widget.ContentRect.Size.x / Widget.ContentRect.Size.y;
 		var fov = MathF.Atan( MathF.Tan( FOV.DegreeToRadian() * 0.5f ) * (Aspect * 0.75f) ).RadianToDegree() * 2.0f;
 
-		MainCamera.FieldOfView = fov;
+		Camera.FieldOfView = fov;
 	}
 
 	public void Update()

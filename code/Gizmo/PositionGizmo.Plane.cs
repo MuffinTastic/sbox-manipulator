@@ -29,7 +29,7 @@ public partial class PositionGizmo
 
 			var transform = Parent.GetSelectionTransform();
 
-			var camera = Parent.Session.MainCamera.Position;
+			var camera = Parent.Session.Camera.Position;
 			var offset = SnapInQuadrant( camera );
 
 			var center = offset * (1.0f / PlaneGizmoSize);
@@ -74,7 +74,7 @@ public partial class PositionGizmo
 			var transform = Parent.GetSelectionTransform();
 			var scale = Parent.GetCameraAdjustedScale();
 
-			var camera = Parent.Session.MainCamera.Position;
+			var camera = Parent.Session.Camera.Position;
 			var offset = SnapInQuadrant( camera );
 
 			var renderTransform = new Transform(

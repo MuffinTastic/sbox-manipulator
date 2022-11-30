@@ -91,7 +91,7 @@ public partial class PositionGizmo
 			var transform = Parent.GetSelectionTransform();
 
 			var axisVector = Parent.AxisToVector( Axis );
-			var camDiff = transform.PointToLocal( Parent.Session.MainCamera.Position );
+			var camDiff = transform.PointToLocal( Parent.Session.Camera.Position );
 			var diffNormal = camDiff.Normal;
 
 			if ( diffNormal.Dot( axisVector ) < 0 )
@@ -102,7 +102,7 @@ public partial class PositionGizmo
 
 		public override Plane GetAppropriatePlaneForAxis( Vector3 origin )
 		{
-			var camDiff = origin - Parent.Session.MainCamera.Position;
+			var camDiff = origin - Parent.Session.Camera.Position;
 			var diffNormal = camDiff.Normal;
 			var diffNormalAbs = diffNormal.Abs();
 

@@ -65,7 +65,7 @@ public class ManipulatorWidget : Widget
 
 		SetRenderTarget();
 
-		Session.MainCamera.RenderToPixmap( renderTarget );
+		Session.Camera.RenderToPixmap( renderTarget );
 		Paint.Draw( new Rect( Vector2.Zero, renderTarget.Size ), renderTarget );
 
 		//Session.OverlayCamera.RenderToPixmap( renderTarget );
