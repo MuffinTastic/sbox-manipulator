@@ -4,6 +4,7 @@ using System.Linq;
 using Sandbox;
 using Sandbox.Internal;
 using Tools;
+using Manipulator.Gizmo;
 
 namespace Manipulator;
 

@@ -7,14 +7,16 @@ using Exposed;
 using Sandbox;
 using Sandbox.Internal;
 using Tools;
+using Manipulator.Gizmo;
 
 namespace Manipulator;
+
 public partial class Session
 {
 	public IEntity HoverEntity { get; private set; }
 
 	public Selection Selection = new();
-	public Gizmo Gizmo;
+	public Gizmo.Gizmo Gizmo;
 
 	public Outlines HoverOutlines = new( Color.Blue, Color.Cyan );
 	public Outlines SelectionOutlines = new( Color.Red, Color.Yellow );
