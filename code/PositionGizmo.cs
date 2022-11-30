@@ -319,7 +319,7 @@ public class PositionGizmo : Gizmo
 
 			sceneModel.Transform = renderTransform;
 
-			Graphics.Render( sceneModel, null, color, Override );
+			Graphics.Render( sceneModel, null, color, OverrideNoCull );
 		}
 
 		public override bool Intersects( Ray ray )

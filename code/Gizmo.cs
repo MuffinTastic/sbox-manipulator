@@ -228,6 +228,7 @@ public abstract class Gizmo : IDisposable
 	public abstract class SubGizmo : IDisposable
 	{
 		protected static Material Override = Material.Load( "materials/mnp_override.vmat" );
+		protected static Material OverrideNoCull = Material.Load( "materials/mnp_override_nocull.vmat" );
 
 		protected const float GizmoSize = 16.0f;
 		protected const float FinalScale = 0.15f;
