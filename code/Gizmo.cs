@@ -28,7 +28,7 @@ public abstract class Gizmo : IDisposable
 
 	public Transform DragStartTransform { get; private set; }
 	public SubGizmo Dragged { get; private set; }
-	public bool Local { get; private set; } = true;
+	public bool Local { get; private set; } = false;
 
 	public Gizmo( Session session, Selection selection )
 	{
