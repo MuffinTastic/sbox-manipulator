@@ -8,7 +8,7 @@ namespace Manipulator;
 
 public class Outlines : IValid
 {
-	public static Material Material = Material.FromShader( "Shaders/ManipulatorOutline.vfx" );
+	public static Material Material = Material.FromShader( "Shaders/ManipulatorLine.vfx" );
 
 	public bool IsValid => LocalBBoxVertices is not null;
 
