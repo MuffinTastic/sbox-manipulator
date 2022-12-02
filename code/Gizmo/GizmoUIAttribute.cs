@@ -16,11 +16,11 @@ public class GizmoUIAttribute : Attribute
 
 	// --------------------- //
 
-	private Type type;
+	public Type Type { get; private set; }
 
 	public Gizmo CreateGizmo( Session session, Selection selection )
 	{
-		return TypeLibrary.Create<Gizmo>( type, new object[] { session, selection } );
+		return TypeLibrary.Create<Gizmo>( Type, new object[] { session, selection } );
 	}
 
 	// --------------------- //
@@ -42,7 +42,7 @@ public class GizmoUIAttribute : Attribute
 
 		foreach ( var pair in pairs )
 		{
-			pair.Attribute.type = pair.Type.TargetType;
+			pair.Attribute.Type = pair.Type.TargetType;
 		}
 
 		var all = pairs
@@ -59,5 +59,6 @@ public class GizmoUIAttribute : Attribute
 	{
 		AllInternal?.Clear();
 		AllInternal = null;
+		GetGizmoTypes();
 	}
 }

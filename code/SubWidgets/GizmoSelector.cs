@@ -13,16 +13,29 @@ public class GizmoSelector : UIBackground
 {
 	private ManipulatorWidget Manipulator;
 
-	private List<GizmoSelectorButton> buttons = new();
+	private List<GizmoSelectorButton> buttons;
 
 	public GizmoSelector( Widget parent, ManipulatorWidget manipulator ) : base( parent )
 	{
 		Manipulator = manipulator;
 
-		SetLayout( LayoutMode.LeftToRight );
+		RebuildUI();
+	}
 
-		Layout.Margin = ManipulatorWidget.UIMargin;
-		Layout.Spacing = ManipulatorWidget.UISpacing;
+	[Event.Hotload]
+	public void RebuildUI()
+	{
+		DestroyChildren();
+		buttons?.Clear();
+		buttons = new List<GizmoSelectorButton>();
+
+		if ( Layout is null )
+		{
+			SetLayout( LayoutMode.LeftToRight );
+
+			Layout.Margin = ManipulatorWidget.UIMargin;
+			Layout.Spacing = ManipulatorWidget.UISpacing;
+		}
 
 		foreach ( var attribute in GizmoUIAttribute.All )
 		{
@@ -38,11 +51,11 @@ public class GizmoSelector : UIBackground
 		Manipulator.Session?.SetGizmo( attribute );
 	}
 
-	public void OnGizmoSet( GizmoUIAttribute attribute )
+	public void OnGizmoSet( Type gizmoType )
 	{
 		foreach ( var button in buttons )
 		{
-			button.Checked = button.Attribute == attribute;
+			button.Checked = button.Attribute.Type == gizmoType;
 		}
 	}
 }

@@ -53,6 +53,7 @@ public partial class ManipulatorWidget
 		if ( Session.IsValid() && GizmoSelector is not null )
 		{
 			Session.OnGizmoUpdated += GizmoSelector.OnGizmoSet;
+			GizmoSelector.OnGizmoSet( Session.Gizmo.GetType() );
 			GizmoSelector.Show();
 		}
 	}

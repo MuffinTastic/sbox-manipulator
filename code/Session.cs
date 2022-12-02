@@ -33,17 +33,12 @@ public partial class Session : RenderHook, IDisposable, IValid
 		Camera.EnablePostProcessing = true;
 		Camera.BackgroundColor = Color.Black;
 
+		SetGizmo( GizmoUIAttribute.All.First() );
+
 		// Session
 		Camera.AddHook( this );
 
 		OnResize();
-	}
-
-	// Anything that could be listened to by UI should be done here
-	// Bit of a hack but it works
-	public void PostUISetup()
-	{
-		SetGizmo( GizmoUIAttribute.All.First() );
 	}
 
 	public void Dispose()

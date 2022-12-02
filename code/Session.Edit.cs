@@ -16,7 +16,7 @@ public partial class Session
 
 	public Selection Selection = new();
 
-	public Gizmo.Gizmo Gizmo;
+	public Gizmo.Gizmo Gizmo { get; private set; }
 
 	public Outlines HoverOutlines = new( Color.Blue, Color.Cyan );
 	public Outlines SelectionOutlines = new( Color.Red, Color.Yellow );
@@ -123,12 +123,12 @@ public partial class Session
 		}
 	}
 
-	public event Action<GizmoUIAttribute> OnGizmoUpdated;
+	public event Action<Type> OnGizmoUpdated;
 
 	public void SetGizmo( GizmoUIAttribute attribute )
 	{
 		Gizmo = attribute.CreateGizmo( this, Selection );
-		OnGizmoUpdated?.Invoke( attribute );
+		OnGizmoUpdated?.Invoke( attribute.Type );
 	}
 
 	private GameTraceResult RunTrace( Ray ray )

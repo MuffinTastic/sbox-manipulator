@@ -138,8 +138,6 @@ public partial class ManipulatorWidget : Widget
 
 		ActivateUI();
 
-		Session.PostUISetup();
-
 		connecting = false;
 	}
 
