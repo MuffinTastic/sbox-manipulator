@@ -10,6 +10,8 @@ public partial class Session
 {
 	public IEntity HoverEntity { get; private set; }
 
+	public bool LocalManipulation { get; private set; } = false;
+
 	public Selection Selection = new();
 
 	public Gizmo.Gizmo Gizmo;
@@ -101,8 +103,8 @@ public partial class Session
 	{
 		if ( e.Key == KeyCode.R )
 		{
-			Gizmo.ToggleLocal();
-
+			LocalManipulation = !LocalManipulation;
+			Gizmo.ResetDragStartTransform();
 			Gizmo.UpdateDrag( GetCursorRay() );
 		}
 	}

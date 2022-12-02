@@ -65,7 +65,7 @@ public abstract class SubGizmo : IDisposable
 			case Axis.Camera: color = new Vector3( 1.0f, 1.0f, 1.0f ); break;
 		}
 
-		if ( Parent.Local )
+		if ( Parent.Session.LocalManipulation )
 		{
 			if ( Axis == Axis.Z )
 				color = new Vector3( 0.5f, 0.0f, 1.0f );

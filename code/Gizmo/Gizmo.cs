@@ -22,7 +22,6 @@ public abstract class Gizmo : IDisposable
 
 	public Transform DragStartTransform { get; private set; }
 	public SubGizmo Dragged { get; private set; }
-	public bool Local { get; private set; } = false;
 
 	public Gizmo( Session session, Selection selection )
 	{
@@ -65,10 +64,8 @@ public abstract class Gizmo : IDisposable
 		Dragged = null;
 	}
 
-	public void ToggleLocal()
+	public void ResetDragStartTransform()
 	{
-		Local = !Local;
-
 		if ( IsDragging )
 		{
 			DragStartTransform = GetSelectionTransform();
@@ -139,7 +136,7 @@ public abstract class Gizmo : IDisposable
 
 		Selection.Position = newPosition;
 
-		if ( Local )
+		if ( Session.LocalManipulation )
 		{
 			var transform = GetDragTransform();
 			newRotation = transform.Rotation.Inverse * newRotation;
@@ -215,7 +212,7 @@ public abstract class Gizmo : IDisposable
 
 	public Transform GetSelectionTransform()
 	{
-		if ( Local )
+		if ( Session.LocalManipulation )
 		{
 			return new Transform( Selection.Position, Selection.SelectedEntities.First().Transform.Rotation );
 		}
