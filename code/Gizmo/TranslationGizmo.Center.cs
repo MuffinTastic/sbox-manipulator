@@ -29,7 +29,8 @@ public partial class TranslationGizmo
 
 		public override void StartDrag()
 		{
-			base.StartDrag();
+			var origin = Parent.Selection.Position;
+			plane = GetAppropriatePlaneForAxis( origin );
 
 			Parent.Session.SnapMouseToWorld( Parent.GetSelectionTransform().Position );
 		}

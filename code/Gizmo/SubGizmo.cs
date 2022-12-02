@@ -40,15 +40,10 @@ public abstract class SubGizmo : IDisposable
 	}
 
 	public abstract void Update();
+	public abstract void StartDrag();
 	public abstract void UpdateDrag( Ray ray );
 	public abstract void Render( Session session );
 	public abstract bool Intersects( Ray ray );
-
-	public virtual void StartDrag()
-	{
-		var origin = Parent.Selection.Position;
-		plane = GetAppropriatePlaneForAxis( origin );
-	}
 
 	public abstract Plane GetAppropriatePlaneForAxis( Vector3 origin );
 

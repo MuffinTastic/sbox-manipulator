@@ -11,7 +11,7 @@ public partial class TranslationGizmo
 
 		public PlaneGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_plane.vmdl" )
 		{
-
+			plane = GetAppropriatePlaneForAxis();
 		}
 
 		public override void Update()
@@ -40,8 +40,6 @@ public partial class TranslationGizmo
 
 		public override void StartDrag()
 		{
-			base.StartDrag();
-
 			Parent.Session.SnapMouseToWorld( Parent.GetSelectionTransform().Position );
 		}
 
@@ -88,7 +86,7 @@ public partial class TranslationGizmo
 			return bbox.Intersection( ray, out var _, out var _ );
 		}
 
-		public override Plane GetAppropriatePlaneForAxis( Vector3 origin )
+		public override Plane GetAppropriatePlaneForAxis( Vector3 origin = default )
 		{
 			return new Plane( Vector3.Zero, Parent.AxisToVector( Axis ) );
 		}
