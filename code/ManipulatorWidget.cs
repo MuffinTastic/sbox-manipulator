@@ -55,19 +55,16 @@ public class ManipulatorWidget : Widget
 	{
 		base.OnPaint();
 
-		if ( !Session.IsValid() )
+		SetRenderTarget();
+
+		if ( !Session.IsValid() || renderTargetDirty )
 		{
 			DrawDisabledMessage();
 			return;
 		}
 
-		SetRenderTarget();
-
 		Session.Camera.RenderToPixmap( renderTarget );
 		Paint.Draw( new Rect( Vector2.Zero, renderTarget.Size ), renderTarget );
-
-		//Session.OverlayCamera.RenderToPixmap( renderTarget );
-		//Paint.Draw( new Rect( Vector2.Zero, renderTarget.Size ), renderTarget );
 
 		Session.OnPaint();
 	}
@@ -87,9 +84,18 @@ public class ManipulatorWidget : Widget
 		Paint.SetPen( Theme.ControlText );
 		Paint.SetDefaultFont( size: 12.0f, weight: 400 );
 
-		var text = connecting ?
-			"Game started\nConnecting..." :
-			"No game is running\nManipulator disabled";
+		string text;
+
+		if ( connecting )
+			text = "Game started\n" +
+				   "Connecting...";
+		else if ( renderTargetDirty )
+			text = "Widget resizing\n" +
+				   "Manipulator disabled";
+		else
+			text = "No game is running\n" +
+				   "Manipulator disabled";
+
 		Paint.DrawText( r.Shrink( 5.0f ), text );
 	}
 
@@ -129,15 +135,20 @@ public class ManipulatorWidget : Widget
 		connecting = false;
 	}
 
+	// It freaks the fuck out if we recreate the render target too fast
+	// So let's add a little timeout
+	RealTimeSince lastResize = 0.0f;
+
 	protected override void OnResize()
 	{
 		renderTargetDirty = true;
-		Session?.OnResize();
+		lastResize = 0.0f;
+		Session?.OnResize();	
 	}
 
 	private void SetRenderTarget( bool force = false )
 	{
-		if ( renderTargetDirty || force )
+		if ( (renderTargetDirty && lastResize > 0.25f) || force )
 		{
 			renderTarget = new Pixmap( (int) Size.x, (int) Size.y );
 			renderTargetDirty = false;
