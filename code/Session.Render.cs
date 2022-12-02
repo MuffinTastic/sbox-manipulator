@@ -95,7 +95,7 @@ public partial class Session
 						$"pressIsLeftClick {pressIsLeftClick},\n" +
 						$"pressIsRightClick {pressIsRightClick}";
 
-			Paint.DrawText( Widget.ContentRect.Shrink( 8.0f ), text, flags: TextFlag.LeftTop );
+			Paint.DrawText( ParentWidget.ContentRect.Shrink( 8.0f ), text, flags: TextFlag.LeftTop );
 		}
 	}
 }

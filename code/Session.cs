@@ -10,7 +10,7 @@ public partial class Session : RenderHook, IDisposable, IValid
 {
 	public const float FOV = 90.0f;
 
-	public Widget Widget { get; init; }
+	public ManipulatorWidget ParentWidget { get; init; }
 	
 	public SceneWorld SceneWorld { get; init; }
 	public SceneCamera Camera { get; private set; }
@@ -19,9 +19,9 @@ public partial class Session : RenderHook, IDisposable, IValid
 
 	public bool IsValid => Global.InGame;
 
-	public Session( Widget parent, SceneWorld sceneWorld )
+	public Session( ManipulatorWidget parent, SceneWorld sceneWorld )
 	{
-		Widget = parent;
+		ParentWidget = parent;
 		SceneWorld = sceneWorld;
 
 
@@ -54,7 +54,7 @@ public partial class Session : RenderHook, IDisposable, IValid
 
 	public void OnResize()
 	{
-		var Aspect = Widget.ContentRect.Size.x / Widget.ContentRect.Size.y;
+		var Aspect = ParentWidget.ContentRect.Size.x / ParentWidget.ContentRect.Size.y;
 		var fov = MathF.Atan( MathF.Tan( FOV.DegreeToRadian() * 0.5f ) * (Aspect * 0.75f) ).RadianToDegree() * 2.0f;
 
 		Camera.FieldOfView = fov;

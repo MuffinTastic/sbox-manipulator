@@ -24,7 +24,7 @@ public partial class Session
 	private void StartCameraRotation()
 	{
 		CameraRotating = true;
-		Widget.Cursor = CursorShape.Blank;
+		ParentWidget.Cursor = CursorShape.Blank;
 		cameraMovePreviousCursorPosition = Application.CursorPosition;
 	}
 
@@ -34,7 +34,7 @@ public partial class Session
 			Application.CursorPosition = cameraMovePreviousCursorPosition;
 
 		CameraRotating = false;
-		Widget.Cursor = CursorShape.None;
+		ParentWidget.Cursor = CursorShape.None;
 	}
 
 	private void UpdateCamera()
@@ -58,7 +58,7 @@ public partial class Session
 			EditDragMove();
 		}
 
-		if ( !Widget.IsFocused || !CameraRotating )
+		if ( !ParentWidget.IsFocused || !CameraRotating )
 		{
 			if ( CameraRotating )
 				StopCameraRotation( resetMouse: false );

@@ -137,17 +137,17 @@ public partial class Session
 
 	public Ray GetCursorRay()
 	{
-		var direction = Screen.GetDirection( Application.CursorPosition - Widget.ScreenPosition, FOV, Camera.Rotation, Widget.ContentRect.Size );
+		var direction = Screen.GetDirection( Application.CursorPosition - ParentWidget.ScreenPosition, FOV, Camera.Rotation, ParentWidget.ContentRect.Size );
 		return new Ray( Camera.Position, direction );
 	}
 
 	public void SnapMouseToWorld( Vector3 position )
 	{
-		var screenPos = Screen.ProjectFromWorld( position, FOV, new Transform( Camera.Position, Camera.Rotation ), Widget.ContentRect.Size );
+		var screenPos = Screen.ProjectFromWorld( position, FOV, new Transform( Camera.Position, Camera.Rotation ), ParentWidget.ContentRect.Size );
 
 		if ( screenPos is Vector2 pos )
 		{
-			Application.CursorPosition = Widget.ScreenPosition + pos;
+			Application.CursorPosition = ParentWidget.ScreenPosition + pos;
 		}
 	}
 
