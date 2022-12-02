@@ -1,8 +1,8 @@
 ﻿namespace Manipulator.Gizmo;
 
-public partial class PositionGizmo : Gizmo
+public partial class TranslationGizmo : Gizmo
 {
-	public PositionGizmo( Session session, Selection selection ) : base( session, selection )
+	public TranslationGizmo( Session session, Selection selection ) : base( session, selection )
 	{
 		SubGizmos = new SubGizmo[]
 		{

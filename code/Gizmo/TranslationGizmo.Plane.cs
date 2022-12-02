@@ -3,7 +3,7 @@ using Manipulator.Extensions;
 
 namespace Manipulator.Gizmo;
 
-public partial class PositionGizmo
+public partial class TranslationGizmo
 {
 	private class PlaneGizmo : SubGizmo
 	{

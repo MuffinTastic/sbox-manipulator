@@ -36,7 +36,7 @@ public partial class Session : RenderHook, IDisposable, IValid
 		// Session
 		Camera.AddHook( this );
 
-		Gizmo = new PositionGizmo( this, Selection );
+		Gizmo = new TranslationGizmo( this, Selection );
 
 		OnResize();
 	}
