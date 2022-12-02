@@ -22,8 +22,6 @@ public partial class TranslationGizmo
 			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Forward : Vector3.Up;
 			var rot = Rotation.LookAt( direction, up );
 
-			var transform = Parent.GetSelectionTransform();
-
 			var camera = Parent.Session.Camera.Position;
 			var offset = SnapInQuadrant( camera );
 
