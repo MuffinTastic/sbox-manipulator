@@ -11,6 +11,7 @@ public partial class Session
 	public IEntity HoverEntity { get; private set; }
 
 	public Selection Selection = new();
+
 	public Gizmo.Gizmo Gizmo;
 
 	public Outlines HoverOutlines = new( Color.Blue, Color.Cyan );
@@ -18,7 +19,7 @@ public partial class Session
 
 	private void EditMouseClick( MouseEvent e )
 	{
-		if ( CameraRotating )
+		if ( !ShouldInteract() )
 			return;
 
 		if ( e.LeftMouseButton )
@@ -53,7 +54,7 @@ public partial class Session
 
 	private bool StartEditDrag()
 	{
-		if ( CameraRotating )
+		if ( !ShouldInteract() )
 			return false;
 
 		return Gizmo.StartDrag( GetCursorRay() );
@@ -61,7 +62,7 @@ public partial class Session
 
 	private void EditDragMove()
 	{
-		if ( CameraRotating )
+		if ( !ShouldInteract() )
 			return;
 
 		Gizmo.UpdateDrag( GetCursorRay() );
@@ -69,7 +70,7 @@ public partial class Session
 
 	private void StopEditDrag()
 	{
-		if ( CameraRotating )
+		if ( !ShouldInteract() )
 			return;
 
 		Gizmo.StopDrag( GetCursorRay() );
@@ -80,11 +81,11 @@ public partial class Session
 		HoverEntity = null;
 
 		var ray = GetCursorRay();
-		if ( !Gizmo.IsHovering( ray ) && !CameraRotating )
+		if ( ShouldInteract() && !Gizmo.IsHovering( ray ) )
 		{
 			var tr = RunTrace( ray );
 
-			if ( tr.Hit && !CameraRotating )
+			if ( tr.Hit )
 			{
 				HoverEntity = tr.Entity;
 			}

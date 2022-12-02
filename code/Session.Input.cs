@@ -150,4 +150,9 @@ public partial class Session
 			Application.CursorPosition = Widget.ScreenPosition + pos;
 		}
 	}
+
+	public bool ShouldInteract()
+	{
+		return !CameraRotating;
+	}
 }

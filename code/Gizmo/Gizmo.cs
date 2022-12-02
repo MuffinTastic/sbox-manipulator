@@ -77,6 +77,9 @@ public abstract class Gizmo : IDisposable
 
 	public bool IsHovering( Ray ray )
 	{
+		if ( !Session.ShouldInteract() )
+			return false;
+
 		if ( !Selection.IsValid() )
 			return false;
 
@@ -85,6 +88,9 @@ public abstract class Gizmo : IDisposable
 
 	public bool IsHovering( Ray ray, SubGizmo subGizmo )
 	{
+		if ( !Session.ShouldInteract() )
+			return false;
+
 		if ( !Selection.IsValid() )
 			return false;
 
