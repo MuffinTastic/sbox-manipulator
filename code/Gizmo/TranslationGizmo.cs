@@ -1,5 +1,6 @@
 ﻿namespace Manipulator.Gizmo;
 
+[GizmoUI( Name = "Translation", Icon = "open_with", Order = 1 )]
 public partial class TranslationGizmo : Gizmo
 {
 	public TranslationGizmo( Session session, Selection selection ) : base( session, selection )
