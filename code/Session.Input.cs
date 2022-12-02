@@ -153,6 +153,6 @@ public partial class Session
 
 	public bool ShouldInteract()
 	{
-		return !CameraRotating;
+		return !ParentWidget.IsUIHovered() && !CameraRotating;
 	}
 }

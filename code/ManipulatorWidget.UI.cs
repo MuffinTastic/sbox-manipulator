@@ -62,4 +62,9 @@ public partial class ManipulatorWidget
 	{
 		GizmoSelector?.Hide();
 	}
+
+	public bool IsUIHovered()
+	{
+		return GizmoSelector.IsUnderMouse /* ... */;
+	}
 }
