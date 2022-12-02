@@ -18,7 +18,7 @@ public class GizmoUIAttribute : Attribute
 
 	private Type type;
 
-	public Gizmo Create( Session session, Selection selection )
+	public Gizmo CreateGizmo( Session session, Selection selection )
 	{
 		return TypeLibrary.Create<Gizmo>( type, new object[] { session, selection } );
 	}

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Sandbox;
 using Tools;
 using Manipulator.Gizmo;
+using System.Linq;
 
 namespace Manipulator;
 
@@ -24,7 +25,6 @@ public partial class Session : RenderHook, IDisposable, IValid
 		ParentWidget = parent;
 		SceneWorld = sceneWorld;
 
-
 		Camera = new SceneCamera( "Manipulator Main Camera" );
 		Camera.World = SceneWorld;
 
@@ -36,15 +36,21 @@ public partial class Session : RenderHook, IDisposable, IValid
 		// Session
 		Camera.AddHook( this );
 
-		Gizmo = new TranslationGizmo( this, Selection );
-
 		OnResize();
+	}
+
+	// Anything that could be listened to by UI should be done here
+	// Bit of a hack but it works
+	public void PostUISetup()
+	{
+		SetGizmo( GizmoUIAttribute.All.First() );
 	}
 
 	public void Dispose()
 	{
 		Camera?.RemoveAllHooks();
 		Camera = null;
+		OnGizmoUpdated = null;
 
 		foreach ( var model in testmodels )
 		{

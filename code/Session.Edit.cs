@@ -1,5 +1,7 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Exposed;
+using Manipulator.Gizmo;
 using Sandbox;
 using Sandbox.Internal;
 using Tools;
@@ -107,6 +109,26 @@ public partial class Session
 			Gizmo.ResetDragStartTransform();
 			Gizmo.UpdateDrag( GetCursorRay() );
 		}
+
+		var num = (int) e.Key;
+		if ( num >= (int) KeyCode.Num1 && num <= (int) KeyCode.Num9 )
+		{
+			var attributes = GizmoUIAttribute.All;
+			
+			num -= (int)KeyCode.Num1;
+			if ( num < attributes.Count )
+			{
+				SetGizmo( attributes[num] );
+			}
+		}
+	}
+
+	public event Action<GizmoUIAttribute> OnGizmoUpdated;
+
+	public void SetGizmo( GizmoUIAttribute attribute )
+	{
+		Gizmo = attribute.CreateGizmo( this, Selection );
+		OnGizmoUpdated?.Invoke( attribute );
 	}
 
 	private GameTraceResult RunTrace( Ray ray )

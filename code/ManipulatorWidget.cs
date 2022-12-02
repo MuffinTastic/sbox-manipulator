@@ -6,7 +6,7 @@ using Tools;
 namespace Manipulator;
 
 [Dock( "Editor", "Manipulator", "pinch" )]
-public class ManipulatorWidget : Widget
+public partial class ManipulatorWidget : Widget
 {
 	private bool connecting = false;
 
@@ -21,6 +21,8 @@ public class ManipulatorWidget : Widget
 		MinimumSize = 300;
 		MouseTracking = true;
 		FocusMode = FocusMode.Click;
+
+		CreateUI();
 	}
 
 	[Event.Frame]
@@ -109,6 +111,8 @@ public class ManipulatorWidget : Widget
 		Session.Dispose();
 		Session = null;
 
+		DeactivateUI();
+
 		// Force an update so it shows the "disabled" message immediately
 		Update();
 	}
@@ -131,6 +135,10 @@ public class ManipulatorWidget : Widget
 
 		SetRenderTarget( force: true );
 		Session = new Session( this, mainSceneWorld );
+
+		ActivateUI();
+
+		Session.PostUISetup();
 
 		connecting = false;
 	}
