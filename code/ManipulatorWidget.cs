@@ -89,7 +89,7 @@ public class ManipulatorWidget : Widget
 		if ( connecting )
 			text = "Game started\n" +
 				   "Connecting...";
-		else if ( renderTargetDirty )
+		else if ( renderTargetDirty && Session.IsValid() )
 			text = "Widget resizing\n" +
 				   "Manipulator disabled";
 		else
@@ -137,7 +137,7 @@ public class ManipulatorWidget : Widget
 
 	// It freaks the fuck out if we recreate the render target too fast
 	// So let's add a little timeout
-	RealTimeSince lastResize = 0.0f;
+	RealTimeSince lastResize = 1.0f;
 
 	protected override void OnResize()
 	{
