@@ -32,6 +32,7 @@ public partial class ManipulatorWidget
 		Hideables.Clear();
 
 		DestroyChildren();
+		Layout.Clear( true );
 
 		GizmoSelector = null;
 
