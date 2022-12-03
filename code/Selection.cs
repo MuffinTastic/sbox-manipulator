@@ -163,6 +163,7 @@ public class Selection : IValid
 		{
 			var entity = pair.Item1;
 			var localTransform = pair.Item2;
+			localTransform.Position *= selectionTransform.Scale;
 			
 			var worldTransform = selectionTransform.ToWorld( localTransform ).WithScale( localTransform.Scale * selectionTransform.Scale );
 			entity.SetTransform( worldTransform );
