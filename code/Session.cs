@@ -41,8 +41,6 @@ public partial class Session : RenderHook, IDisposable, IValid
 
 		Binds = Binds.Load();
 
-		var a = new BindsWindow( Binds );
-
 		OnResize();
 	}
 
