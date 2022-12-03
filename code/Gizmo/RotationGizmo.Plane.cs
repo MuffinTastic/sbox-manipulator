@@ -12,40 +12,34 @@ public partial class RotationGizmo
 {
 	private class PlaneGizmo : SubGizmo
 	{
-		const float PlaneGizmoSize = 12.0f;
+		const float PlaneGizmoScale = 0.8f;
 
-		public PlaneGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_plane.vmdl" )
+		Rotation rot;
+
+		public PlaneGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_rotate.vmdl" )
 		{
 			plane = GetAppropriatePlaneForAxis();
+
+			var direction = Parent.AxisToVector( Axis );
+			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Forward : Vector3.Up;
+			rot = Rotation.LookAt( direction, up );
 		}
 
 		public override void Update()
 		{
-			Vector3 corner1, corner2;
 
-			var direction = Parent.AxisToVector( Axis );
-			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Forward : Vector3.Up;
-			var rot = Rotation.LookAt( direction, up );
-
-			var camera = Parent.Session.Camera.Position;
-			var offset = SnapInQuadrant( camera );
-
-			var center = offset * (1.0f / PlaneGizmoSize);
-
-			corner1 = center + (rot.Left + rot.Up) * Gap;
-			corner2 = center + (rot.Right + rot.Down) * Gap;
-
-			var scale = Parent.GetCameraAdjustedScale();
-			corner1 *= scale;
-			corner2 *= scale;
-
-			Vector3.Sort( ref corner1, ref corner2 );
-			bbox = new BBox( corner1, corner2 );
 		}
 
-		public override void StartDrag()
-		{
+		Vector3 startAngle;
 
+		public override void StartDrag( Ray ray )
+		{
+			var transform = Parent.GetDragTransform();
+			ray = transform.RayToLocal( ray );
+
+			var point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
+
+			startAngle = point.Normal;
 		}
 
 		public override void UpdateDrag( Ray ray )
@@ -55,40 +49,72 @@ public partial class RotationGizmo
 
 			Vector3 point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
 
-			var newPosition = transform.PointToWorld( point );
-			Parent.Move( newPosition, transform.Rotation );
+			var newAngle = point.Normal;
+
+			var change = Vector3.GetAngle( startAngle, newAngle );
+			
+			var cross = Vector3.Cross( startAngle, newAngle );
+			cross *= plane.Normal;
+			var clockwise = (cross.x + cross.y + cross.z) < 0.0f;
+			if ( clockwise )
+				change *= -1.0f;
+
+			Rotation newRotation;
+
+			if ( Axis == Axis.X )
+			{
+				newRotation = Rotation.FromRoll( change );
+			}
+			else if ( Axis == Axis.Y )
+			{
+				newRotation = Rotation.FromPitch( change );
+			}
+			else // Axis.Z
+			{
+				newRotation = Rotation.FromYaw( change );
+			}
+
+			newRotation = transform.RotationToWorld( newRotation );
+
+			Parent.UpdateSelectionTransform( transform.Position, newRotation, 1.0f );
 		}
 
 		public override void Render( Session session )
 		{
 			var color = GetGizmoColor();
 
-			var direction = Parent.AxisToVector( Axis );
-			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Forward : Vector3.Up;
-			var rot = Rotation.LookAt( direction, up );
-
 			var transform = Parent.GetSelectionTransform();
 			var scale = Parent.GetCameraAdjustedScale();
 
-			var camera = Parent.Session.Camera.Position;
-			var offset = SnapInQuadrant( camera );
-
 			var renderTransform = new Transform(
-				transform.Position + transform.Rotation * offset * (1.0f / PlaneGizmoSize) * scale,
+				transform.Position,
 				transform.Rotation * rot,
-				RenderSize * scale
+				ModelSizeHalfScaleAdjuster * PlaneGizmoScale * scale
 			);
 
 			sceneModel.Transform = renderTransform;
 
-			Graphics.Render( sceneModel, null, color, OverrideNoCull );
+			Graphics.Render( sceneModel, null, color, Override );
 		}
 
-		public override bool Intersects( Ray ray )
+		public override bool Intersects( Ray ray, out float distance )
 		{
+			distance = 0.0f;
 			var transform = Parent.GetSelectionTransform();
 			ray = transform.RayToLocal( ray );
-			return bbox.Intersection( ray, out var _, out var _ );
+
+			var scale = Parent.GetCameraAdjustedScale();
+			var intersection = plane.Trace( ray, twosided: true );
+			
+			if ( intersection is null )
+				return false;
+			
+			var maxDist = ModelSizeHalfScaleAdjuster * PlaneGizmoScale * scale * 8.0f;
+			var distanceFromCenter = Vector3.DistanceBetween( Vector3.Zero, intersection.Value );
+			var intersects = distanceFromCenter < maxDist;
+
+			distance = Vector3.DistanceBetween( ray.Origin, intersection.Value );
+			return intersects;
 		}
 
 		public override Plane GetAppropriatePlaneForAxis( Vector3 origin = default )

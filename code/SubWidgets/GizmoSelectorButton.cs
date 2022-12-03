@@ -16,8 +16,7 @@ public class GizmoSelectorButton : SelectorButton
 		Attribute = attribute;
 
 		Icon = attribute.Icon;
-		StatusTip = attribute.Name;
 		ToolTip = $"Switch to the {attribute.Name} gizmo";
-		Cursor = CursorShape.Finger;
+		StatusTip = ToolTip;
 	}
 }

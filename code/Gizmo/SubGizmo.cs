@@ -10,17 +10,13 @@ public abstract class SubGizmo : IDisposable
 	protected static Material Override = Material.Load( "materials/mnp_override.vmat" );
 	protected static Material OverrideNoCull = Material.Load( "materials/mnp_override_nocull.vmat" );
 
-	protected const float GizmoSize = 16.0f;
-	protected const float FinalScale = 0.15f;
-	protected const float RenderSize = 1.0f / GizmoSize * FinalScale;
-	protected const float Gap = 0.2f * FinalScale;
-	protected const float Width = 0.1f * FinalScale;
-	protected const float Length = 1.0f * FinalScale;
+	protected float ModelSize;
+	protected float ModelSizeScaleAdjuster;
+	protected float ModelSizeHalfScaleAdjuster;
 
 	protected readonly Gizmo Parent;
 	protected readonly Axis Axis;
 
-	protected BBox bbox;
 	protected Plane plane;
 
 	protected SceneModel sceneModel;
@@ -32,6 +28,11 @@ public abstract class SubGizmo : IDisposable
 
 		sceneModel = new SceneModel( parent.Session.SceneWorld, modelName, Transform.Zero );
 		sceneModel.RenderingEnabled = false;
+
+		var boundsSize = sceneModel.Model.RenderBounds.Size;
+		ModelSize = MathF.Max( boundsSize.x, MathF.Max( boundsSize.y, boundsSize.z ) );
+		ModelSizeScaleAdjuster = 1.0f / (ModelSize);
+		ModelSizeHalfScaleAdjuster = 1.0f / (ModelSize * 2.0f);
 	}
 
 	public void Dispose()
@@ -40,10 +41,10 @@ public abstract class SubGizmo : IDisposable
 	}
 
 	public abstract void Update();
-	public abstract void StartDrag();
+	public abstract void StartDrag( Ray ray );
 	public abstract void UpdateDrag( Ray ray );
 	public abstract void Render( Session session );
-	public abstract bool Intersects( Ray ray );
+	public abstract bool Intersects( Ray ray, out float distance );
 
 	public abstract Plane GetAppropriatePlaneForAxis( Vector3 origin );
 
@@ -52,7 +53,7 @@ public abstract class SubGizmo : IDisposable
 		var ray = Parent.Session.GetCursorRay();
 		var intersects = Parent.IsHovering( ray, this );
 
-		if ( Parent.Dragged == this || intersects )
+		if ( Parent.Dragged == this || (Parent.Dragged is null && intersects) )
 			return Color.Yellow;
 
 		var color = Color.Black;

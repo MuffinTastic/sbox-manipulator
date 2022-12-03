@@ -7,6 +7,13 @@ public partial class TranslationGizmo
 {
 	private class AxisGizmo : SubGizmo
 	{
+		const float AxisGizmoScale = 0.17f;
+		const float Width = 0.1f;
+		const float Length = 1.0f;
+		const float Gap = 0.3f;
+
+		BBox bbox;
+
 		public AxisGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_arrow.vmdl" )
 		{
 
@@ -20,18 +27,18 @@ public partial class TranslationGizmo
 			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Left : Vector3.Up;
 			var rot = Rotation.LookAt( direction, up );
 
-			corner1 = rot.Forward * (Width + Gap) + (rot.Right + rot.Down) * Width;
-			corner2 = rot.Forward * Length + (rot.Left + rot.Up) * Width;
+			corner1 = rot.Forward * (Gap) + (rot.Right + rot.Down) * Width;
+			corner2 = rot.Forward * (Gap + Length) + (rot.Left + rot.Up) * Width;
 
 			var scale = Parent.GetCameraAdjustedScale();
-			corner1 *= scale;
-			corner2 *= scale;
+			corner1 *= AxisGizmoScale * scale;
+			corner2 *= AxisGizmoScale * scale;
 
 			Vector3.Sort( ref corner1, ref corner2 );
 			bbox = new BBox( corner1, corner2 );
 		}
 
-		public override void StartDrag()
+		public override void StartDrag( Ray ray )
 		{
 			var origin = Parent.Selection.Position;
 			plane = GetAppropriatePlaneForAxis( origin );
@@ -50,7 +57,7 @@ public partial class TranslationGizmo
 			delta = axisVector.Dot( delta ) * axisVector;
 
 			var newPosition = transform.PointToWorld( delta );
-			Parent.Move( newPosition, transform.Rotation );
+			Parent.UpdateSelectionTransform( newPosition, transform.Rotation, 1.0f );
 		}
 
 		public override void Render( Session session )
@@ -65,9 +72,9 @@ public partial class TranslationGizmo
 			var scale = Parent.GetCameraAdjustedScale();
 
 			var renderTransform = new Transform(
-				transform.Position + transform.Rotation * (rot.Forward * Gap * scale),
+				transform.Position + transform.Rotation * (rot.Forward * Gap * AxisGizmoScale * scale),
 				transform.Rotation * rot,
-				RenderSize * scale
+				ModelSizeScaleAdjuster * AxisGizmoScale * scale
 			);
 
 			sceneModel.Transform = renderTransform;
@@ -75,11 +82,13 @@ public partial class TranslationGizmo
 			Graphics.Render( sceneModel, null, color, Override );
 		}
 
-		public override bool Intersects( Ray ray )
+		public override bool Intersects( Ray ray, out float distance )
 		{
 			var transform = Parent.GetSelectionTransform();
 			ray = transform.RayToLocal( ray );
-			return bbox.Intersection( ray, out var _, out var _ );
+			var intersects = bbox.Intersection( ray, out var point1, out var _ );
+			distance = Vector3.DistanceBetween( point1, ray.Origin );
+			return intersects;
 		}
 
 		public Vector3 GetAppropriateAxisDirection()

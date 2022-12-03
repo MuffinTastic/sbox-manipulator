@@ -3,7 +3,7 @@ using Manipulator.Extensions;
 
 namespace Manipulator.Gizmo;
 
-public partial class TranslationGizmo
+public partial class ScaleGizmo
 {
 	private class CenterGizmo : SubGizmo
 	{
@@ -11,7 +11,9 @@ public partial class TranslationGizmo
 
 		BBox bbox;
 
-		public CenterGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_center.vmdl" )
+		Rotation startRot;
+
+		public CenterGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_scalar.vmdl" )
 		{
 
 		}
@@ -31,12 +33,15 @@ public partial class TranslationGizmo
 			bbox = new BBox( corner1, corner2 );
 		}
 
+		Vector3 startPoint;
+
 		public override void StartDrag( Ray ray )
 		{
 			var origin = Parent.Selection.Position;
 			plane = GetAppropriatePlaneForAxis( origin );
 
-			Parent.Session.SnapMouseToWorld( Parent.GetSelectionTransform().Position );
+			Vector3 point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
+			startPoint = Parent.Session.Camera.Rotation.Inverse * point;
 		}
 
 		public override void UpdateDrag( Ray ray )
@@ -44,9 +49,12 @@ public partial class TranslationGizmo
 			var transform = Parent.GetDragTransform();
 
 			Vector3 point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
+			point = Parent.Session.Camera.Rotation.Inverse * point;
 
-			var newPosition = transform.PointToWorld( point );
-			Parent.UpdateSelectionTransform( point, transform.Rotation, 1.0f );
+			var newScaleOffset = -(point.y - startPoint.y) / 250.0f;
+			var newScale = 1.0f + newScaleOffset.Clamp( -0.99f, float.MaxValue );
+
+			Parent.UpdateSelectionTransform( transform.Position, transform.Rotation, transform.Scale * newScale );
 		}
 
 		public override void Render( Session session )
@@ -78,6 +86,16 @@ public partial class TranslationGizmo
 		public override Plane GetAppropriatePlaneForAxis( Vector3 origin )
 		{
 			return new Plane( origin, Parent.AxisToVector( Axis.Camera ) );
+		}
+		public override Color GetGizmoColor()
+		{
+			var ray = Parent.Session.GetCursorRay();
+			var intersects = Parent.IsHovering( ray, this );
+
+			if ( Parent.Dragged == this || (Parent.Dragged is null && intersects) )
+				return Color.Yellow;
+
+			return Color.Magenta.Desaturate( 0.1f );
 		}
 	}
 }

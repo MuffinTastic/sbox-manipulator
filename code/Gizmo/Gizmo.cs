@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using Sandbox;
 
@@ -36,13 +37,13 @@ public abstract class Gizmo : IDisposable
 
 		Dragged = null;
 
-		Dragged = SubGizmos.FirstOrDefault( g => g.Intersects( ray ) );
+		Dragged = GetHovered( ray );
 
 		if ( IsDragging )
 		{
 			DragStartTransform = GetSelectionTransform();
 
-			Dragged.StartDrag();
+			Dragged.StartDrag( ray );
 		}
 
 		return IsDragging;
@@ -80,7 +81,7 @@ public abstract class Gizmo : IDisposable
 		if ( !Selection.IsValid() )
 			return false;
 
-		return SubGizmos.Any( g => g.Intersects( ray ) );
+		return SubGizmos.Any( g => g.Intersects( ray, out var _ ) );
 	}
 
 	public bool IsHovering( Ray ray, SubGizmo subGizmo )
@@ -91,8 +92,26 @@ public abstract class Gizmo : IDisposable
 		if ( !Selection.IsValid() )
 			return false;
 
-		var hovered = SubGizmos.FirstOrDefault( g => g.Intersects( ray ) );
+		var hovered = GetHovered( ray );
 		return subGizmo == hovered;
+	}
+
+	private SubGizmo GetHovered( Ray ray )
+	{
+		var gizmos = new List<(SubGizmo, float)>();
+
+		foreach ( var gizmo in SubGizmos )
+		{
+			if ( gizmo.Intersects( ray, out var distance ) )
+			{
+				gizmos.Add( ( gizmo, distance ) );
+			}
+		}
+
+		return gizmos
+			.OrderBy( t => t.Item2 )
+			.Select( t => t.Item1 )
+			.FirstOrDefault();
 	}
 
 	public void Update()
@@ -111,25 +130,9 @@ public abstract class Gizmo : IDisposable
 		}
 	}
 
-	public void Render()
-	{
-		if ( !Selection.IsValid() )
-			return;
+	public abstract void Render();
 
-		if ( Dragged is not null )
-		{
-			Dragged.Render( Session );
-		}
-		else
-		{
-			foreach ( var gizmo in SubGizmos )
-			{
-				gizmo.Render( Session );
-			}
-		}
-	}
-
-	public void Move( Vector3 newPosition, Rotation newRotation )
+	public void UpdateSelectionTransform( Vector3 newPosition, Rotation newRotation, float newScale )
 	{
 		if ( !Selection.IsValid() )
 			return;
@@ -139,10 +142,12 @@ public abstract class Gizmo : IDisposable
 		if ( Session.LocalManipulation )
 		{
 			var transform = GetDragTransform();
-			newRotation = transform.Rotation.Inverse * newRotation;
+			newRotation = newRotation * transform.Rotation.Inverse;
 		}
 
 		Selection.Rotation = newRotation;
+
+		Selection.Scale = newScale;
 	}
 
 	public float GetCameraAdjustedScale()
@@ -214,11 +219,11 @@ public abstract class Gizmo : IDisposable
 	{
 		if ( Session.LocalManipulation )
 		{
-			return new Transform( Selection.Position, Selection.SelectedEntities.First().Transform.Rotation );
+			return new Transform( Selection.Position, Selection.SelectedEntities.First().Transform.Rotation, Selection.Scale );
 		}
 		else
 		{
-			return new Transform( Selection.Position, Rotation.Identity );
+			return new Transform( Selection.Position, Rotation.Identity, Selection.Scale );
 		}
 	}
 

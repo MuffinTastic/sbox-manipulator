@@ -14,6 +14,7 @@ public class Selection : IValid
 {
 	private Vector3 _position;
 	private Rotation _rotation;
+	private float _scale;
 
 	public Vector3 Position
 	{
@@ -31,6 +32,16 @@ public class Selection : IValid
 		set
 		{
 			_rotation = value;
+			OnTransformChanged();
+		}
+	}
+
+	public float Scale
+	{
+		get => _scale;
+		set
+		{
+			_scale = value;
 			OnTransformChanged();
 		}
 	}
@@ -135,24 +146,25 @@ public class Selection : IValid
 		
 		_position = averagePosition;
 		_rotation = Rotation.Identity;
-		var selectionTransform = new Transform( _position, _rotation );
+		_scale = 1.0f;
+		var selectionTransform = new Transform( _position, _rotation, _scale );
 
 		foreach ( var entity in SelectedEntities )
 		{
-			LocalTransforms.Add( (entity.GetServerEntity(), selectionTransform.ToLocal( entity.Transform ) ) );
+			LocalTransforms.Add( (entity.GetServerEntity(), selectionTransform.ToLocal( entity.Transform ).WithScale( entity.Transform.Scale ) ) );
 		}
 	}
 
 	private void OnTransformChanged()
 	{
-		var selectionTransform = new Transform( _position, _rotation );
+		var selectionTransform = new Transform( _position, _rotation, _scale );
 
 		foreach ( var pair in LocalTransforms )
 		{
 			var entity = pair.Item1;
 			var localTransform = pair.Item2;
 			
-			var worldTransform = selectionTransform.ToWorld( localTransform );
+			var worldTransform = selectionTransform.ToWorld( localTransform ).WithScale( localTransform.Scale * selectionTransform.Scale );
 			entity.SetTransform( worldTransform );
 			entity.ResetInterpolation();
 		}

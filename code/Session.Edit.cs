@@ -105,32 +105,27 @@ public partial class Session
 
 	private void EditHandleKeyPress( KeyEvent e )
 	{
-		if ( e.Key == KeyCode.R )
+		if ( e.Key == Binds.ToggleLocalManipulation )
 		{
-			LocalManipulation = !LocalManipulation;
+			SetLocalManipulation( !LocalManipulation );
 			Gizmo.ResetDragStartTransform();
 			Gizmo.UpdateDrag( GetCursorRay() );
 		}
 
-		var num = (int) e.Key;
-		if ( num >= (int) KeyCode.Num1 && num <= (int) KeyCode.Num9 )
+		if ( e.Key == Binds.TranslationGizmo )
 		{
-			var attributes = GizmoUIAttribute.All;
-			
-			num -= (int)KeyCode.Num1;
-			if ( num < attributes.Count )
-			{
-				SetGizmo( attributes[num] );
-			}
+			SetGizmo( GizmoUIAttribute.For( typeof( TranslationGizmo ) ) );
 		}
-	}
 
-	public event Action<int> OnGizmoUpdated;
+		if ( e.Key == Binds.RotationGizmo )
+		{
+			SetGizmo( GizmoUIAttribute.For( typeof( RotationGizmo ) ) );
+		}
 
-	public void SetGizmo( GizmoUIAttribute attribute )
-	{
-		Gizmo = attribute.CreateGizmo( this, Selection );
-		OnGizmoUpdated?.Invoke( attribute.Index );
+		if ( e.Key == Binds.ScaleGizmo )
+		{
+			SetGizmo( GizmoUIAttribute.For( typeof( ScaleGizmo ) ) );
+		}
 	}
 
 	private GameTraceResult RunTrace( Ray ray )
@@ -139,6 +134,27 @@ public partial class Session
 			.WorldAndEntities()
 			.Run();
 		return tr;
+	}
+
+	public event Action<int> OnGizmoUpdated;
+	public event Action<bool> OnLocalManipulationUpdated;
+
+	public void SetGizmo( GizmoUIAttribute attribute )
+	{
+		Gizmo = attribute.CreateGizmo( this, Selection );
+		OnGizmoUpdated?.Invoke( attribute.Index );
+	}
+
+	public void SetLocalManipulation( bool on )
+	{
+		LocalManipulation = on;
+		OnLocalManipulationUpdated?.Invoke( on );
+	}
+
+	public void ResetUIListeners()
+	{
+		OnGizmoUpdated = null;
+		OnLocalManipulationUpdated = null;
 	}
 
 	private void SpawnDebugArrow( GameTraceResult tr )

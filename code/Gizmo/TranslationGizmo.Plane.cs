@@ -7,7 +7,10 @@ public partial class TranslationGizmo
 {
 	private class PlaneGizmo : SubGizmo
 	{
-		const float PlaneGizmoSize = 12.0f;
+		const float PlaneGizmoOffsetScale = 0.55f;
+		const float PlaneGizmoScale = 0.1f;
+
+		BBox bbox;
 
 		public PlaneGizmo( Gizmo parent, Axis axis ) : base( parent, axis, "models/gizmo_plane.vmdl" )
 		{
@@ -25,20 +28,20 @@ public partial class TranslationGizmo
 			var camera = Parent.Session.Camera.Position;
 			var offset = SnapInQuadrant( camera );
 
-			var center = offset * (1.0f / PlaneGizmoSize);
+			var center = offset * PlaneGizmoOffsetScale;
 
-			corner1 = center + (rot.Left + rot.Up) * Gap;
-			corner2 = center + (rot.Right + rot.Down) * Gap;
+			corner1 = center + (rot.Left + rot.Up) * 0.25f;
+			corner2 = center + (rot.Right + rot.Down) * 0.25f;
 
 			var scale = Parent.GetCameraAdjustedScale();
-			corner1 *= scale;
-			corner2 *= scale;
+			corner1 *= ModelSizeScaleAdjuster * scale;
+			corner2 *= ModelSizeScaleAdjuster * scale;
 
 			Vector3.Sort( ref corner1, ref corner2 );
 			bbox = new BBox( corner1, corner2 );
 		}
 
-		public override void StartDrag()
+		public override void StartDrag( Ray ray )
 		{
 			Parent.Session.SnapMouseToWorld( Parent.GetSelectionTransform().Position );
 		}
@@ -51,7 +54,7 @@ public partial class TranslationGizmo
 			Vector3 point = plane.Trace( ray, twosided: true ).GetValueOrDefault();
 
 			var newPosition = transform.PointToWorld( point );
-			Parent.Move( newPosition, transform.Rotation );
+			Parent.UpdateSelectionTransform( newPosition, transform.Rotation, 1.0f );
 		}
 
 		public override void Render( Session session )
@@ -69,9 +72,9 @@ public partial class TranslationGizmo
 			var offset = SnapInQuadrant( camera );
 
 			var renderTransform = new Transform(
-				transform.Position + transform.Rotation * offset * (1.0f / PlaneGizmoSize) * scale,
+				transform.Position + transform.Rotation * offset * PlaneGizmoOffsetScale * ModelSizeScaleAdjuster * scale,
 				transform.Rotation * rot,
-				RenderSize * scale
+				ModelSizeHalfScaleAdjuster * PlaneGizmoScale * scale
 			);
 
 			sceneModel.Transform = renderTransform;
@@ -79,11 +82,13 @@ public partial class TranslationGizmo
 			Graphics.Render( sceneModel, null, color, OverrideNoCull );
 		}
 
-		public override bool Intersects( Ray ray )
+		public override bool Intersects( Ray ray, out float distance )
 		{
 			var transform = Parent.GetSelectionTransform();
 			ray = transform.RayToLocal( ray );
-			return bbox.Intersection( ray, out var _, out var _ );
+			var intersects = bbox.Intersection( ray, out var point1, out var _ );
+			distance = Vector3.DistanceBetween( point1, ray.Origin );
+			return intersects;
 		}
 
 		public override Plane GetAppropriatePlaneForAxis( Vector3 origin = default )

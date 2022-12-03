@@ -91,37 +91,49 @@ public partial class Session
 
 	private void ApplyCameraKeyPress( KeyEvent e )
 	{
-		if ( e.Key == KeyCode.W )
+		if ( e.Key == Binds.MoveForward )
 			cameraForwardPressed = true;
-		if ( e.Key == KeyCode.S )
+		
+		if ( e.Key == Binds.MoveBackward )
 			cameraBackwardPressed = true;
-		if ( e.Key == KeyCode.A )
+		
+		if ( e.Key == Binds.MoveLeft )
 			cameraLeftPressed = true;
-		if ( e.Key == KeyCode.D )
+
+		if ( e.Key == Binds.MoveRight )
 			cameraRightPressed = true;
-		if ( e.Key == KeyCode.E )
+		
+		if ( e.Key == Binds.MoveUp )
 			cameraUpPressed = true;
-		if ( e.Key == KeyCode.Q )
+		
+		if ( e.Key == Binds.MoveDown )
 			cameraDownPressed = true;
-		if ( e.Key == KeyCode.Shift )
+		
+		if ( e.Key == Binds.BoostSpeed )
 			cameraBoostPressed = true;
 	}
 
 	private void ApplyCameraKeyRelease( KeyEvent e )
 	{
-		if ( e.Key == KeyCode.W )
+		if ( e.Key == Binds.MoveForward )
 			cameraForwardPressed = false;
-		if ( e.Key == KeyCode.S )
+
+		if ( e.Key == Binds.MoveBackward )
 			cameraBackwardPressed = false;
-		if ( e.Key == KeyCode.A )
+
+		if ( e.Key == Binds.MoveLeft )
 			cameraLeftPressed = false;
-		if ( e.Key == KeyCode.D )
+
+		if ( e.Key == Binds.MoveRight )
 			cameraRightPressed = false;
-		if ( e.Key == KeyCode.E )
+
+		if ( e.Key == Binds.MoveUp )
 			cameraUpPressed = false;
-		if ( e.Key == KeyCode.Q )
+
+		if ( e.Key == Binds.MoveDown )
 			cameraDownPressed = false;
-		if ( e.Key == KeyCode.Shift )
+
+		if ( e.Key == Binds.BoostSpeed )
 			cameraBoostPressed = false;
 	}
 }

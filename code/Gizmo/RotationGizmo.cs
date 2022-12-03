@@ -1,4 +1,6 @@
-﻿namespace Manipulator.Gizmo;
+﻿using Sandbox;
+
+namespace Manipulator.Gizmo;
 
 [GizmoUI( Name = "Rotation", Icon = "rotate_right", Order = 2 )]
 public partial class RotationGizmo : Gizmo
@@ -11,5 +13,16 @@ public partial class RotationGizmo : Gizmo
 			new PlaneGizmo( this, Axis.Y ),
 			new PlaneGizmo( this, Axis.Z )
 		};
+	}
+
+	public override void Render()
+	{
+		if ( !Selection.IsValid() )
+			return;
+
+		foreach ( var gizmo in SubGizmos )
+		{
+			gizmo.Render( Session );
+		}
 	}
 }

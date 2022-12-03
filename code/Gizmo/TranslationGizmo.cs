@@ -1,4 +1,6 @@
-﻿namespace Manipulator.Gizmo;
+﻿using Sandbox;
+
+namespace Manipulator.Gizmo;
 
 [GizmoUI( Name = "Translation", Icon = "open_with", Order = 1 )]
 public partial class TranslationGizmo : Gizmo
@@ -15,5 +17,23 @@ public partial class TranslationGizmo : Gizmo
 			new PlaneGizmo( this, Axis.Y ),
 			new PlaneGizmo( this, Axis.Z )
 		};
+	}
+
+	public override void Render()
+	{
+		if ( !Selection.IsValid() )
+			return;
+
+		if ( Dragged is not null )
+		{
+			Dragged.Render( Session );
+		}
+		else
+		{
+			foreach ( var gizmo in SubGizmos )
+			{
+				gizmo.Render( Session );
+			}
+		}
 	}
 }

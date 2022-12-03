@@ -11,7 +11,6 @@ namespace Manipulator.SubWidgets;
 
 public class GizmoSelector : Selector
 {
-
 	private ManipulatorWidget Manipulator { get; set; }
 
 	public GizmoSelector( Widget parent, ManipulatorWidget manipulator ) : base( parent )
@@ -35,14 +34,7 @@ public class GizmoSelector : Selector
 
 	public void OnActivate()
 	{
-		foreach ( var button in Buttons )
-		{
-			var gizmoButton = (GizmoSelectorButton) button;
-			var buttonType = gizmoButton.Attribute.Type;
-			var gizmoType = Manipulator.Session?.Gizmo.GetType();
-
-			button.Checked = buttonType == gizmoType;
-		}
+		SetButtonActiveFunc( ( SelectorButton button ) => (button as GizmoSelectorButton).Attribute.Type == Manipulator.Session?.Gizmo.GetType() );
 	}
 
 	public override void OnButtonClicked( SelectorButton button )
@@ -56,6 +48,6 @@ public class GizmoSelector : Selector
 
 	public void OnGizmoSet( int index )
 	{
-		SetButtonActiveIndex( index );
+		SetButtonActiveFunc( ( SelectorButton button ) => (button as GizmoSelectorButton).Attribute.Index == index );
 	}
 }

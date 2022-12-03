@@ -37,6 +37,11 @@ public class GizmoUIAttribute : Attribute
 		}
 	}
 
+	public static GizmoUIAttribute For( Type gizmoType )
+	{
+		return All.Where( a => a.Type == gizmoType ).FirstOrDefault();
+	}
+
 	private static List<GizmoUIAttribute> GetGizmoTypes()
 	{
 		var pairs = TypeLibrary.GetTypesWithAttribute<GizmoUIAttribute>()
