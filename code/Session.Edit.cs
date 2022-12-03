@@ -84,6 +84,8 @@ public partial class Session
 	{
 		HoverEntity = null;
 
+		Selection.CullInvalid();
+
 		var ray = GetCursorRay();
 		if ( ShouldInteract() && !Gizmo.IsHovering( ray ) )
 		{

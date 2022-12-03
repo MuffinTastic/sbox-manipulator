@@ -97,6 +97,28 @@ public static class IEntityExtensions
 		}
 	}
 
+	public static bool IsValid( this IEntity ent )
+	{
+		if ( ent is null )
+			return false;
+
+		var type = ent.GetType();
+		var isValidProperty = type.GetProperty( "IsValid", BindingFlags.Instance | BindingFlags.Public );
+
+		if ( isValidProperty is null )
+			return false;
+
+		try
+		{
+			return (bool) isValidProperty.GetValue( ent, null );
+		}
+		catch ( NullReferenceException nre )
+		{
+			Log.Error( nre );
+			return false;
+		}
+	}
+
 	private static Dictionary<IEntity, IEntity> ClientToServer = new();
 
 	public static IEntity GetServerEntity( this IEntity clientEntity )

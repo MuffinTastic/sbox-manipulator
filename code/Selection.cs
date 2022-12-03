@@ -108,6 +108,13 @@ public class Selection : IValid
 		}
 	}
 
+	public void CullInvalid()
+	{
+		var removed = SelectedEntities.RemoveWhere( entity => !entity.IsValid() );
+		if ( removed != 0 )
+			RebuildTransforms();
+	}
+
 	public void RebuildTransforms()
 	{
 		LocalTransforms.Clear();
