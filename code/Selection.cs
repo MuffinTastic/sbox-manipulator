@@ -167,6 +167,7 @@ public class Selection : IValid
 			
 			var worldTransform = selectionTransform.ToWorld( localTransform ).WithScale( localTransform.Scale * selectionTransform.Scale );
 			entity.SetTransform( worldTransform );
+			entity.SetVelocity( 0.0f );
 			entity.ResetInterpolation();
 		}
 	}
