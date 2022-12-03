@@ -29,7 +29,7 @@ public partial class ManipulatorWidget : Widget
 	protected void Frame()
 	{
 		// Edge checks
-		if ( Session is null && Global.InGame )
+		if ( Session is null && Global.InGame && !connecting )
 		{
 			Activate();
 		}
