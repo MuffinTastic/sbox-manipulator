@@ -41,11 +41,17 @@ public partial class Session : RenderHook, IDisposable, IValid
 		OnResize();
 	}
 
+	public void ResetUIListeners()
+	{
+		OnGizmoUpdated = null;
+	}
+
 	public void Dispose()
 	{
+		ResetUIListeners();
+
 		Camera?.RemoveAllHooks();
 		Camera = null;
-		OnGizmoUpdated = null;
 
 		foreach ( var model in testmodels )
 		{

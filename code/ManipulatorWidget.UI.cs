@@ -18,22 +18,32 @@ public partial class ManipulatorWidget
 
 	private GizmoSelector GizmoSelector;
 
-	private void CreateUI()
+	[Event.Hotload]
+	private void BuildUI()
 	{
-		SetLayout( LayoutMode.TopToBottom );
+		DeactivateUI();
 
-		Layout.Margin = UIMargin;
+		DestroyChildren();
+		GizmoSelector = null;
+
+		if ( Layout is null )
+		{
+			SetLayout( LayoutMode.TopToBottom );
+			Layout.Margin = UIMargin;
+		}
 
 		var top = new Widget( this );
 		top.SetLayout( LayoutMode.LeftToRight );
 		{
-			GizmoSelector = new GizmoSelector( top, this );
+			var leftBackground = new UIBackground( this );
+			{
+				GizmoSelector = new GizmoSelector( top, this );
+				leftBackground.Layout.Add( GizmoSelector );
+			}
 
-			top.Layout.Add( GizmoSelector );
+			top.Layout.Add( leftBackground );
 			top.Layout.AddStretchCell();
-
 		}
-
 
 		var bottom = new Widget( this );
 		bottom.SetLayout( LayoutMode.LeftToRight );
@@ -45,7 +55,14 @@ public partial class ManipulatorWidget
 		Layout.AddStretchCell();
 		Layout.Add( bottom );
 
-		DeactivateUI();
+		if ( Session.IsValid() )
+		{
+			ActivateUI();
+		}
+		else
+		{
+			DeactivateUI();
+		}
 	}
 
 	private void ActivateUI()
@@ -53,7 +70,7 @@ public partial class ManipulatorWidget
 		if ( Session.IsValid() && GizmoSelector is not null )
 		{
 			Session.OnGizmoUpdated += GizmoSelector.OnGizmoSet;
-			GizmoSelector.OnGizmoSet( Session.Gizmo.GetType() );
+			GizmoSelector.OnActivate();
 			GizmoSelector.Show();
 		}
 	}
@@ -61,6 +78,7 @@ public partial class ManipulatorWidget
 	private void DeactivateUI()
 	{
 		GizmoSelector?.Hide();
+		Session?.ResetUIListeners();
 	}
 
 	public bool IsUIHovered()

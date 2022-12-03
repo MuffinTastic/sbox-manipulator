@@ -22,7 +22,7 @@ public partial class ManipulatorWidget : Widget
 		MouseTracking = true;
 		FocusMode = FocusMode.Click;
 
-		CreateUI();
+		BuildUI();
 	}
 
 	[Event.Frame]

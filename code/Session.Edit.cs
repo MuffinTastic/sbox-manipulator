@@ -123,12 +123,12 @@ public partial class Session
 		}
 	}
 
-	public event Action<Type> OnGizmoUpdated;
+	public event Action<int> OnGizmoUpdated;
 
 	public void SetGizmo( GizmoUIAttribute attribute )
 	{
 		Gizmo = attribute.CreateGizmo( this, Selection );
-		OnGizmoUpdated?.Invoke( attribute.Type );
+		OnGizmoUpdated?.Invoke( attribute.Index );
 	}
 
 	private GameTraceResult RunTrace( Ray ray )

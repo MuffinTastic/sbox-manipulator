@@ -16,6 +16,7 @@ public class GizmoUIAttribute : Attribute
 
 	// --------------------- //
 
+	public int Index { get; private set; }
 	public Type Type { get; private set; }
 
 	public Gizmo CreateGizmo( Session session, Selection selection )
@@ -38,16 +39,18 @@ public class GizmoUIAttribute : Attribute
 
 	private static List<GizmoUIAttribute> GetGizmoTypes()
 	{
-		var pairs = TypeLibrary.GetTypesWithAttribute<GizmoUIAttribute>().ToList();
+		var pairs = TypeLibrary.GetTypesWithAttribute<GizmoUIAttribute>()
+			.OrderBy( p => p.Attribute.Order ).ToList();
 
-		foreach ( var pair in pairs )
+		for ( int i = 0; i < pairs.Count; i++ )
 		{
+			var pair = pairs[i];
+			pair.Attribute.Index = i;
 			pair.Attribute.Type = pair.Type.TargetType;
 		}
 
 		var all = pairs
 			.Select( p => p.Attribute )
-			.OrderBy( a => a.Order )
 			.ToList();
 
 		AllInternal = all;

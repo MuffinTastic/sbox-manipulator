@@ -11,7 +11,9 @@ public class UIBackground : Widget
 {
 	public UIBackground( Widget parent ) : base( parent )
 	{
+		SetLayout( LayoutMode.LeftToRight );
 
+		Layout.Margin = ManipulatorWidget.UIMargin;
 	}
 
 	protected override void OnPaint()

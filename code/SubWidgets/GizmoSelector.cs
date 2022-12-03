@@ -9,53 +9,53 @@ using Tools;
 
 namespace Manipulator.SubWidgets;
 
-public class GizmoSelector : UIBackground
+public class GizmoSelector : Selector
 {
-	private ManipulatorWidget Manipulator;
 
-	private List<GizmoSelectorButton> buttons;
+	private ManipulatorWidget Manipulator { get; set; }
 
 	public GizmoSelector( Widget parent, ManipulatorWidget manipulator ) : base( parent )
 	{
 		Manipulator = manipulator;
 
-		RebuildUI();
+		Log.Info( Manipulator );
+
+		BuildUI();
 	}
 
-	[Event.Hotload]
-	public void RebuildUI()
+	protected override void BuildButtons()
 	{
-		DestroyChildren();
-		buttons?.Clear();
-		buttons = new List<GizmoSelectorButton>();
-
-		if ( Layout is null )
-		{
-			SetLayout( LayoutMode.LeftToRight );
-
-			Layout.Margin = ManipulatorWidget.UIMargin;
-			Layout.Spacing = ManipulatorWidget.UISpacing;
-		}
-
 		foreach ( var attribute in GizmoUIAttribute.All )
 		{
 			var button = new GizmoSelectorButton( this, attribute );
 
-			Layout.Add( button );
-			buttons.Add( button );
+			AddButton( button );
 		}
 	}
 
-	public void OnGizmoButtonClicked( GizmoUIAttribute attribute )
+	public void OnActivate()
 	{
-		Manipulator.Session?.SetGizmo( attribute );
-	}
-
-	public void OnGizmoSet( Type gizmoType )
-	{
-		foreach ( var button in buttons )
+		foreach ( var button in Buttons )
 		{
-			button.Checked = button.Attribute.Type == gizmoType;
+			var gizmoButton = (GizmoSelectorButton) button;
+			var buttonType = gizmoButton.Attribute.Type;
+			var gizmoType = Manipulator.Session?.Gizmo.GetType();
+
+			button.Checked = buttonType == gizmoType;
 		}
+	}
+
+	public override void OnButtonClicked( SelectorButton button )
+	{
+		var gizmoButton = (GizmoSelectorButton) button;
+
+		base.OnButtonClicked( gizmoButton );
+
+		Manipulator.Session?.SetGizmo( gizmoButton.Attribute );
+	}
+
+	public void OnGizmoSet( int index )
+	{
+		SetButtonActiveIndex( index );
 	}
 }
