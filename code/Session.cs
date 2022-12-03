@@ -4,6 +4,7 @@ using Sandbox;
 using Tools;
 using Manipulator.Gizmo;
 using System.Linq;
+using Manipulator.SubWidgets;
 
 namespace Manipulator;
 
@@ -38,12 +39,11 @@ public partial class Session : RenderHook, IDisposable, IValid
 		// Session
 		Camera.AddHook( this );
 
-		OnResize();
-	}
+		Binds = Binds.Load();
 
-	public void ResetUIListeners()
-	{
-		OnGizmoUpdated = null;
+		var a = new BindsWindow( Binds );
+
+		OnResize();
 	}
 
 	public void Dispose()
