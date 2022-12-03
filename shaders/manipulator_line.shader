@@ -1,6 +1,6 @@
-﻿HEADER
+HEADER
 {
-	Description = "Template Shader for S&box";
+	Description = "Line shader for the Manipulator tool";
 }
 
 MODES
