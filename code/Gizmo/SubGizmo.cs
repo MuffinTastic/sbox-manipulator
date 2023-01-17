@@ -28,6 +28,7 @@ public abstract class SubGizmo : IDisposable
 
 		sceneModel = new SceneModel( parent.Session.SceneWorld, modelName, Transform.Zero );
 		sceneModel.RenderingEnabled = false;
+		sceneModel.Batchable = false;
 
 		var boundsSize = sceneModel.Model.RenderBounds.Size;
 		ModelSize = MathF.Max( boundsSize.x, MathF.Max( boundsSize.y, boundsSize.z ) );
@@ -43,8 +44,14 @@ public abstract class SubGizmo : IDisposable
 	public abstract void Update();
 	public abstract void StartDrag( Ray ray );
 	public abstract void UpdateDrag( Ray ray );
-	public abstract void Render( Session session );
+	public abstract void PreRender( Session session );
 	public abstract bool Intersects( Ray ray, out float distance );
+
+	public void Render()
+	{
+		Graphics.Attributes.Set( "Color", GetGizmoColor() );
+		Graphics.Render( sceneModel, material: Override );
+	}
 
 	public abstract Plane GetAppropriatePlaneForAxis( Vector3 origin );
 

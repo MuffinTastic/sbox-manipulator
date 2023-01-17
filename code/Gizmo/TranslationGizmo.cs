@@ -26,13 +26,15 @@ public partial class TranslationGizmo : Gizmo
 
 		if ( Dragged is not null )
 		{
-			Dragged.Render( Session );
+			Dragged.PreRender( Session );
+			Dragged.Render();
 		}
 		else
 		{
 			foreach ( var gizmo in SubGizmos )
 			{
-				gizmo.Render( Session );
+				gizmo.PreRender( Session );
+				gizmo.Render();
 			}
 		}
 	}

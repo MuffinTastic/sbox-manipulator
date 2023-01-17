@@ -20,7 +20,8 @@ public partial class ScaleGizmo : Gizmo
 
 		foreach ( var gizmo in SubGizmos )
 		{
-			gizmo.Render( Session );
+			gizmo.PreRender( Session );
+			gizmo.Render();
 		}
 	}
 }

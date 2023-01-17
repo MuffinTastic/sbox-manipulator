@@ -49,9 +49,8 @@ public partial class TranslationGizmo
 			Parent.UpdateSelectionTransform( point, transform.Rotation, 1.0f );
 		}
 
-		public override void Render( Session session )
+		public override void PreRender( Session session )
 		{
-			var color = GetGizmoColor();
 			var transform = Parent.GetSelectionTransform();
 			var scale = Parent.GetCameraAdjustedScale();
 
@@ -62,8 +61,6 @@ public partial class TranslationGizmo
 			);
 
 			sceneModel.Transform = renderTransform;
-
-			Graphics.Render( sceneModel, null, color, Override );
 		}
 
 		public override bool Intersects( Ray ray, out float distance )

@@ -22,7 +22,8 @@ public partial class RotationGizmo : Gizmo
 
 		foreach ( var gizmo in SubGizmos )
 		{
-			gizmo.Render( Session );
+			gizmo.PreRender( Session );
+			gizmo.Render();
 		}
 	}
 }

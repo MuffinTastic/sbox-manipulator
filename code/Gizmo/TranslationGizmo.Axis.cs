@@ -60,10 +60,8 @@ public partial class TranslationGizmo
 			Parent.UpdateSelectionTransform( newPosition, transform.Rotation, 1.0f );
 		}
 
-		public override void Render( Session session )
+		public override void PreRender( Session session )
 		{
-			var color = GetGizmoColor();
-
 			var direction = GetAppropriateAxisDirection();
 			var up = direction.z.AlmostEqual( 0.0f ) ? Vector3.Left : Vector3.Up;
 			var rot = Rotation.LookAt( direction, up );
@@ -78,8 +76,6 @@ public partial class TranslationGizmo
 			);
 
 			sceneModel.Transform = renderTransform;
-
-			Graphics.Render( sceneModel, null, color, Override );
 		}
 
 		public override bool Intersects( Ray ray, out float distance )
