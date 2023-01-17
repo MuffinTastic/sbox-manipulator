@@ -227,7 +227,7 @@ public abstract class Gizmo : IDisposable
 		}
 		else
 		{
-			return new Transform( Selection.Position, Rotation.Identity, Selection.Scale );
+			return new Transform( Selection.Position, Selection.Rotation, Selection.Scale );
 		}
 	}
 
