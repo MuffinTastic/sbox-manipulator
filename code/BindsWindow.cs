@@ -20,6 +20,8 @@ public class BindsWindow : BaseWindow
 	public object UnsavedBinds { get; private set; }
 
 	private List<BindInput> Inputs;
+	private Button ApplyButton;
+	private Button AcceptButton;
 
 	public BindsWindow( ManipulatorWidget manipulator ) : base()
 	{
@@ -82,17 +84,17 @@ public class BindsWindow : BaseWindow
 		var resetButton = new Button( "Reset", buttonArea );
 		resetButton.Clicked += ResetBinds;
 
-		var applyButton = new Button( "Apply", buttonArea );
-		applyButton.Clicked += SaveBinds;
+		ApplyButton = new Button( "Apply", buttonArea );
+		ApplyButton.Clicked += SaveBinds;
 
-		var acceptButton = new Button( "Accept", buttonArea );
-		acceptButton.Clicked += SaveAndClose;
+		AcceptButton = new Button( "Accept", buttonArea );
+		AcceptButton.Clicked += SaveAndClose;
 
 		buttonArea.Layout.Add( cancelButton );
 		buttonArea.Layout.AddStretchCell();
 		buttonArea.Layout.Add( resetButton );
-		buttonArea.Layout.Add( applyButton );
-		buttonArea.Layout.Add( acceptButton );
+		buttonArea.Layout.Add( ApplyButton );
+		buttonArea.Layout.Add( AcceptButton );
 		Layout.Add( buttonArea );
 
 		CheckForConflicts();
@@ -159,18 +161,25 @@ public class BindsWindow : BaseWindow
 			inputList.Add( input );
 		}
 
+		bool disableApply = false;
+
 		// Set inputs to valid/invalid based on whether or not any other inputs use their key
 		foreach ( var key in usedKeys.Keys )
 		{
 			usedKeys.TryGetValue( key, out var inputList );
 
 			var invalid = inputList.Count > 1;
+			if ( invalid )
+				disableApply = true;
 
 			foreach ( var input in inputList )
 			{
 				input.Invalid = invalid;
 			}
 		}
+
+		ApplyButton.Enabled = !disableApply;
+		AcceptButton.Enabled = !disableApply;
 
 		Update();
 	}
