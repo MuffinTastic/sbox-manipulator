@@ -8,7 +8,6 @@ namespace Manipulator.Gizmo;
 public abstract class SubGizmo : IDisposable
 {
 	protected static Material Override = Material.Load( "materials/mnp_override.vmat" );
-	protected static Material OverrideNoCull = Material.Load( "materials/mnp_override_nocull.vmat" );
 
 	protected float ModelSize;
 	protected float ModelSizeScaleAdjuster;
