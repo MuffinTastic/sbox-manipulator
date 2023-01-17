@@ -40,8 +40,6 @@ public partial class Session : RenderHook, IDisposable, IValid
 		// Session
 		Camera.AddHook( this );
 
-		Binds = Binds.Load();
-
 		OnResize();
 	}
 

@@ -22,6 +22,10 @@ public partial class ManipulatorWidget
 	private LocalSelector LocalSelector;
 	private ManipulatorButton PivotToggle;
 
+	public Binds Binds { get; private set; }
+
+	private BindsWindow BindsWindow;
+
 	[Event.Hotload]
 	private void BuildUI()
 	{
@@ -85,7 +89,7 @@ public partial class ManipulatorWidget
 
 				var settingsButton = new ManipulatorButton( this );
 				settingsButton.Icon = "settings";
-				settingsButton.Clicked += () => Log.Info( "mhm " );
+				settingsButton.Clicked += OpenBindsWindow;
 				rightBackground.Layout.Add( settingsButton );
 			}
 
@@ -135,5 +139,23 @@ public partial class ManipulatorWidget
 	public bool IsUIHovered()
 	{
 		return Children.Any( w => w.IsUnderMouse );
+	}
+
+	public void OpenBindsWindow()
+	{
+		if ( BindsWindow is not null )
+		{
+			BindsWindow.Focus();
+			return;
+		}
+
+		BindsWindow = new BindsWindow( this );
+		BindsWindow.OnClose += () => BindsWindow = null;
+	}
+
+	public void SaveBinds( Binds binds )
+	{
+		Binds = binds;
+		Binds.Save( Binds );
 	}
 }

@@ -107,29 +107,29 @@ public partial class Session
 
 	private void EditHandleKeyPress( KeyEvent e )
 	{
-		if ( e.Key == Binds.ToggleLocalManipulation )
+		if ( e.Key == ParentWidget.Binds.ToggleLocalManipulation )
 		{
 			SetLocalManipulation( !LocalManipulation );
 			Gizmo.ResetDragStartTransform();
 			Gizmo.UpdateDrag( GetCursorRay() );
 		}
 
-		if ( e.Key == Binds.TogglePivotManipulation )
+		if ( e.Key == ParentWidget.Binds.TogglePivotManipulation )
 		{
 			SetPivotManipulation( !PivotManipulation );
 		}
 
-		if ( e.Key == Binds.TranslationGizmo )
+		if ( e.Key == ParentWidget.Binds.SelectTranslationGizmo )
 		{
 			SetGizmo( GizmoUIAttribute.For( typeof( TranslationGizmo ) ) );
 		}
 
-		if ( e.Key == Binds.RotationGizmo )
+		if ( e.Key == ParentWidget.Binds.SelectRotationGizmo )
 		{
 			SetGizmo( GizmoUIAttribute.For( typeof( RotationGizmo ) ) );
 		}
 
-		if ( e.Key == Binds.ScaleGizmo )
+		if ( e.Key == ParentWidget.Binds.SelectScaleGizmo )
 		{
 			SetGizmo( GizmoUIAttribute.For( typeof( ScaleGizmo ) ) );
 		}

@@ -6,7 +6,7 @@ using Editor;
 
 namespace Manipulator;
 
-public class Binds
+public struct Binds
 {
 	public KeyCode MoveForward { get; set; }
 	public KeyCode MoveBackward { get; set; }
@@ -15,46 +15,48 @@ public class Binds
 	public KeyCode MoveUp { get; set; }
 	public KeyCode MoveDown { get; set; }
 	public KeyCode BoostSpeed { get; set; }
-	public KeyCode TranslationGizmo { get; set; }
-	public KeyCode RotationGizmo { get; set; }
-	public KeyCode ScaleGizmo { get; set; }
+	public KeyCode SelectTranslationGizmo { get; set; }
+	public KeyCode SelectRotationGizmo { get; set; }
+	public KeyCode SelectScaleGizmo { get; set; }
 	public KeyCode ToggleLocalManipulation { get; set; }
 	public KeyCode TogglePivotManipulation { get; set; }
 
-	public void ResetToDefaults()
-	{
-		MoveForward = KeyCode.W;
-		MoveBackward = KeyCode.S;
-		MoveLeft = KeyCode.A;
-		MoveRight = KeyCode.D;
-		MoveUp = KeyCode.Q;
-		MoveDown = KeyCode.Z;
-		BoostSpeed = KeyCode.Shift;
 
-		TranslationGizmo = KeyCode.T;
-		RotationGizmo = KeyCode.R;
-		ScaleGizmo = KeyCode.E;
-		ToggleLocalManipulation = KeyCode.C;
-		TogglePivotManipulation = KeyCode.X;
+	public static Binds Defaults()
+	{
+		return new Binds
+		{
+			MoveForward = KeyCode.W,
+			MoveBackward = KeyCode.S,
+			MoveLeft = KeyCode.A,
+			MoveRight = KeyCode.D,
+			MoveUp = KeyCode.Q,
+			MoveDown = KeyCode.Z,
+			BoostSpeed = KeyCode.Shift,
+			SelectTranslationGizmo = KeyCode.T,
+			SelectRotationGizmo = KeyCode.R,
+			SelectScaleGizmo = KeyCode.E,
+			ToggleLocalManipulation = KeyCode.C,
+			TogglePivotManipulation = KeyCode.X
+		};
 	}
 
 	public static Binds Load()
 	{
-		var binds = FileSystem.Root.ReadJsonOrDefault<Binds>( "config/manipulator.json", null );
+		Binds? binds = FileSystem.Root.ReadJsonOrDefault<Binds?>( "config/manipulator.json", null );
 		
 		if ( binds is null )
 		{
-			binds = new Binds();
-			binds.ResetToDefaults();
-			binds.Save();
+			binds = Defaults();
+			Save( binds.Value );
 		}
 
-		return binds;
+		return binds.Value;
 	}
 
-	public void Save()
+	public static void Save( Binds binds )
 	{
-		FileSystem.Root.WriteJson( "config/manipulator.json", this );
+		FileSystem.Root.WriteJson( "config/manipulator.json", binds );
 	}
 
 	public static List<(PropertyInfo prop, DisplayInfo info)> GetProperties()

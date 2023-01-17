@@ -22,6 +22,8 @@ public partial class ManipulatorWidget : Widget
 		MouseTracking = true;
 		FocusMode = FocusMode.Click;
 
+		Binds = Binds.Load();
+
 		BuildUI();
 	}
 

@@ -4,8 +4,6 @@ namespace Manipulator;
 
 public partial class Session
 {
-	public Binds Binds { get; private set; }
-
 	bool leftClickPressed;
 	bool rightClickPressed;
 

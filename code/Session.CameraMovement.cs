@@ -91,49 +91,49 @@ public partial class Session
 
 	private void ApplyCameraKeyPress( KeyEvent e )
 	{
-		if ( e.Key == Binds.MoveForward )
+		if ( e.Key == ParentWidget.Binds.MoveForward )
 			cameraForwardPressed = true;
 		
-		if ( e.Key == Binds.MoveBackward )
+		if ( e.Key == ParentWidget.Binds.MoveBackward )
 			cameraBackwardPressed = true;
 		
-		if ( e.Key == Binds.MoveLeft )
+		if ( e.Key == ParentWidget.Binds.MoveLeft )
 			cameraLeftPressed = true;
 
-		if ( e.Key == Binds.MoveRight )
+		if ( e.Key == ParentWidget.Binds.MoveRight )
 			cameraRightPressed = true;
 		
-		if ( e.Key == Binds.MoveUp )
+		if ( e.Key == ParentWidget.Binds.MoveUp )
 			cameraUpPressed = true;
 		
-		if ( e.Key == Binds.MoveDown )
+		if ( e.Key == ParentWidget.Binds.MoveDown )
 			cameraDownPressed = true;
 		
-		if ( e.Key == Binds.BoostSpeed )
+		if ( e.Key == ParentWidget.Binds.BoostSpeed )
 			cameraBoostPressed = true;
 	}
 
 	private void ApplyCameraKeyRelease( KeyEvent e )
 	{
-		if ( e.Key == Binds.MoveForward )
+		if ( e.Key == ParentWidget.Binds.MoveForward )
 			cameraForwardPressed = false;
 
-		if ( e.Key == Binds.MoveBackward )
+		if ( e.Key == ParentWidget.Binds.MoveBackward )
 			cameraBackwardPressed = false;
 
-		if ( e.Key == Binds.MoveLeft )
+		if ( e.Key == ParentWidget.Binds.MoveLeft )
 			cameraLeftPressed = false;
 
-		if ( e.Key == Binds.MoveRight )
+		if ( e.Key == ParentWidget.Binds.MoveRight )
 			cameraRightPressed = false;
 
-		if ( e.Key == Binds.MoveUp )
+		if ( e.Key == ParentWidget.Binds.MoveUp )
 			cameraUpPressed = false;
 
-		if ( e.Key == Binds.MoveDown )
+		if ( e.Key == ParentWidget.Binds.MoveDown )
 			cameraDownPressed = false;
 
-		if ( e.Key == Binds.BoostSpeed )
+		if ( e.Key == ParentWidget.Binds.BoostSpeed )
 			cameraBoostPressed = false;
 	}
 }
