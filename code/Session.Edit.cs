@@ -137,7 +137,7 @@ public partial class Session
 
 	private GameTraceResult RunTrace( Ray ray )
 	{
-		var tr = GameTrace.Ray( ray.Position, ray.Position + ray.Forward * 1000.0f, client: true )
+		var tr = GameTrace.Ray( ray.Position, ray.Position + ray.Forward * Camera.ZFar, client: true )
 			.WorldAndEntities()
 			.Run();
 		return tr;
