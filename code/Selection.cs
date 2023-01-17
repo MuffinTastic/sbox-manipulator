@@ -132,6 +132,7 @@ public class Selection : IValid
 			RebuildTransforms( resetPivot: true );
 	}
 
+	private Vector3 _pivotOffsetInit = 0.0f;
 	private Vector3 _pivotOffset = 0.0f;
 
 	public void RebuildTransforms( bool resetPivot = false )
@@ -164,7 +165,7 @@ public class Selection : IValid
 		_rotation = Rotation.Identity;
 		_scale = 1.0f;
 
-		_pivotOffset = _position - resetCenter;
+		_pivotOffsetInit = _pivotOffset = _position - resetCenter;
 
 		var selectionTransform = new Transform( _position, _rotation, _scale );
 
@@ -201,5 +202,7 @@ public class Selection : IValid
 			entity.SetVelocity( 0.0f );
 			entity.ResetInterpolation();
 		}
+
+		_pivotOffset = _rotation * _pivotOffsetInit;
 	}
 }
