@@ -1,6 +1,6 @@
 ﻿namespace Tools.Copy;
 using Sandbox;
-
+using Editor;
 public class SheetHeader : Widget
 {
 	PropertySheet Sheet { get; init; }
