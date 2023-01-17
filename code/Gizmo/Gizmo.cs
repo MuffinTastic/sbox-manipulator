@@ -123,6 +123,10 @@ public abstract class Gizmo : IDisposable
 		{
 			Selection.RebuildTransforms();
 		}
+		else
+		{
+			Selection.OnTransformChanged();
+		}
 
 		foreach ( var gizmo in SubGizmos )
 		{

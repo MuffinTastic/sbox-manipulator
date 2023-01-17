@@ -154,7 +154,7 @@ public class Selection : IValid
 		}
 	}
 
-	private void OnTransformChanged()
+	public void OnTransformChanged()
 	{
 		var selectionTransform = new Transform( _position, _rotation, _scale );
 
