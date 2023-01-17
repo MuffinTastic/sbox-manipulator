@@ -95,6 +95,8 @@ public class BindsWindow : BaseWindow
 		buttonArea.Layout.Add( acceptButton );
 		Layout.Add( buttonArea );
 
+		CheckForConflicts();
+
 		Show();
 	}
 
@@ -112,36 +114,7 @@ public class BindsWindow : BaseWindow
 	private void OnBindsChanged()
 	{
 		WindowTitle = BindsTitle + "*";
-
-		// Build a dictionary of all used keys
-		var usedKeys = new Dictionary<KeyCode, List<BindInput>>();
-		foreach ( var input in Inputs )
-		{
-			var key = (KeyCode) input.Property.GetValue( UnsavedBinds );
-
-			if ( !usedKeys.TryGetValue( key, out var inputList ) )
-			{
-				inputList = new List<BindInput>();
-				usedKeys.Add( key, inputList );
-			}
-
-			inputList.Add( input );
-		}
-
-		// Set inputs to valid/invalid based on whether or not any other inputs use their key
-		foreach ( var key in usedKeys.Keys )
-		{
-			usedKeys.TryGetValue( key, out var inputList );
-			
-			var invalid = inputList.Count > 1;
-
-			foreach ( var input in inputList )
-			{
-				input.Invalid = invalid;
-			}
-		}
-
-		Update();
+		CheckForConflicts();
 	}
 
 	private void ResetBinds()
@@ -166,6 +139,40 @@ public class BindsWindow : BaseWindow
 	{
 		SaveBinds();
 		Close();
+	}
+
+	private void CheckForConflicts()
+	{
+
+		// Build a dictionary of all used keys
+		var usedKeys = new Dictionary<KeyCode, List<BindInput>>();
+		foreach ( var input in Inputs )
+		{
+			var key = (KeyCode)input.Property.GetValue( UnsavedBinds );
+
+			if ( !usedKeys.TryGetValue( key, out var inputList ) )
+			{
+				inputList = new List<BindInput>();
+				usedKeys.Add( key, inputList );
+			}
+
+			inputList.Add( input );
+		}
+
+		// Set inputs to valid/invalid based on whether or not any other inputs use their key
+		foreach ( var key in usedKeys.Keys )
+		{
+			usedKeys.TryGetValue( key, out var inputList );
+
+			var invalid = inputList.Count > 1;
+
+			foreach ( var input in inputList )
+			{
+				input.Invalid = invalid;
+			}
+		}
+
+		Update();
 	}
 }
 
