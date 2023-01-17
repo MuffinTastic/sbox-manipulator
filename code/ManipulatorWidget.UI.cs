@@ -7,7 +7,7 @@ using Manipulator.Gizmo;
 using Manipulator.SubWidgets;
 using Sandbox.UI;
 using Sandbox;
-using Tools;
+using Editor;
 
 namespace Manipulator;
 public partial class ManipulatorWidget
@@ -32,7 +32,7 @@ public partial class ManipulatorWidget
 		Hideables.Clear();
 
 		DestroyChildren();
-		Layout.Clear( true );
+		Layout?.Clear( true );
 
 		GizmoSelector = null;
 

@@ -10,14 +10,14 @@ public static class BBoxExtensions
 {
 	public static bool Intersection( this BBox box, Ray r, out Vector3 point1, out Vector3 point2 )
 	{
-		var min = box.Center - box.Size / 2 - r.Origin;
-		var max = box.Center + box.Size / 2 - r.Origin;
+		var min = box.Center - box.Size / 2 - r.Position;
+		var max = box.Center + box.Size / 2 - r.Position;
 		float near = float.MinValue;
 		float far = float.MaxValue;
 
 		// X
-		float t1 = min.x / r.Direction.x;
-		float t2 = max.x / r.Direction.x;
+		float t1 = min.x / r.Forward.x;
+		float t2 = max.x / r.Forward.x;
 		float tMin = Math.Min( t1, t2 );
 		float tMax = Math.Max( t1, t2 );
 		if ( tMin > near ) near = tMin;
@@ -30,8 +30,8 @@ public static class BBoxExtensions
 		}
 
 		// Y
-		t1 = min.y / r.Direction.y;
-		t2 = max.y / r.Direction.y;
+		t1 = min.y / r.Forward.y;
+		t2 = max.y / r.Forward.y;
 		tMin = Math.Min( t1, t2 );
 		tMax = Math.Max( t1, t2 );
 		if ( tMin > near ) near = tMin;
@@ -44,8 +44,8 @@ public static class BBoxExtensions
 		}
 
 		// Z
-		t1 = min.z / r.Direction.z;
-		t2 = max.z / r.Direction.z;
+		t1 = min.z / r.Forward.z;
+		t2 = max.z / r.Forward.z;
 		tMin = Math.Min( t1, t2 );
 		tMax = Math.Max( t1, t2 );
 		if ( tMin > near ) near = tMin;
@@ -57,8 +57,8 @@ public static class BBoxExtensions
 			return false;
 		}
 
-		point1 = r.Origin + r.Direction * near;
-		point2 = r.Origin + r.Direction * far;
+		point1 = r.Position + r.Forward * near;
+		point2 = r.Position + r.Forward * far;
 		return true;
 	}
 }

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using Sandbox;
-using Tools;
-using Manipulator.Gizmo;
 using System.Linq;
+using Sandbox;
+using Editor;
+using Manipulator.Gizmo;
 using Manipulator.SubWidgets;
 
 namespace Manipulator;

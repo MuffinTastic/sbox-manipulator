@@ -1,6 +1,5 @@
 ﻿using System;
-using Manipulator.Gizmo;
-using Tools;
+using Editor;
 
 namespace Manipulator.SubWidgets;
 

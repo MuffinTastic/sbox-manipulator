@@ -113,7 +113,7 @@ public partial class RotationGizmo
 			var distanceFromCenter = Vector3.DistanceBetween( Vector3.Zero, intersection.Value );
 			var intersects = distanceFromCenter < maxDist;
 
-			distance = Vector3.DistanceBetween( ray.Origin, intersection.Value );
+			distance = Vector3.DistanceBetween( ray.Position, intersection.Value );
 			return intersects;
 		}
 

@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Reflection;
 using Sandbox;
+using Editor;
 
 namespace Tools.Copy;
 
@@ -200,7 +201,7 @@ public class PropertySheet : Widget
 
 				foreach ( var attr in visibilityAttributes )
 				{
-					if ( !attr.TestCondition( Target, TypeLibrary.GetDescription( Target.GetType() ) ) )
+					if ( !attr.TestCondition( Target, TypeLibrary.GetType( Target.GetType() ) ) )
 						row.Visible = false;
 				}
 			};

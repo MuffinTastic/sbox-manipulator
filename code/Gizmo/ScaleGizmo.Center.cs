@@ -79,7 +79,7 @@ public partial class ScaleGizmo
 			var transform = Parent.GetSelectionTransform();
 			ray = transform.RayToLocal( ray );
 			var intersects = bbox.Intersection( ray, out var point1, out var _ );
-			distance = Vector3.DistanceBetween( point1, ray.Origin );
+			distance = Vector3.DistanceBetween( point1, ray.Position );
 			return intersects;
 		}
 

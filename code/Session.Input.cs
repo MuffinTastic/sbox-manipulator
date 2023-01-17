@@ -1,4 +1,4 @@
-﻿using Tools;
+﻿using Editor;
 
 namespace Manipulator;
 

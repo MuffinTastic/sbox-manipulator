@@ -3,8 +3,7 @@ using System.Threading.Tasks;
 using Exposed;
 using Manipulator.Gizmo;
 using Sandbox;
-using Sandbox.Internal;
-using Tools;
+using Editor;
 
 namespace Manipulator;
 
@@ -130,7 +129,7 @@ public partial class Session
 
 	private GameTraceResult RunTrace( Ray ray )
 	{
-		var tr = GameTrace.Ray( ray.Origin, ray.Origin + ray.Direction * 1000.0f, client: true )
+		var tr = GameTrace.Ray( ray.Position, ray.Position + ray.Forward * 1000.0f, client: true )
 			.WorldAndEntities()
 			.Run();
 		return tr;

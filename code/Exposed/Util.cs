@@ -13,7 +13,7 @@ internal static class Util
 
 	internal static bool IsServerAssembly( Assembly a )
 	{
-		var hostTypes = a.GetTypes().Where( t => t.FullName == "Sandbox.Host" );
+		var hostTypes = a.GetTypes().Where( t => t.FullName == "Sandbox.Game" );
 
 		foreach ( var hostType in hostTypes )
 		{

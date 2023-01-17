@@ -1,6 +1,6 @@
 ﻿using Sandbox;
 using Sandbox.Internal;
-using Tools;
+using Editor;
 
 namespace Manipulator;
 public partial class Session

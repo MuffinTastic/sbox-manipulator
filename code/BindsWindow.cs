@@ -3,8 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tools;
-using static Tools.Label;
+using Editor;
 
 namespace Manipulator;
 

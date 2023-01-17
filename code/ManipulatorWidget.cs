@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Sandbox;
-using Tools;
+using Editor;
 
 namespace Manipulator;
 
@@ -25,7 +25,7 @@ public partial class ManipulatorWidget : Widget
 		BuildUI();
 	}
 
-	[Event.Frame]
+	[EditorEvent.Frame]
 	protected void Frame()
 	{
 		// Edge checks

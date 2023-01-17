@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Tools;
+using Editor;
 
 namespace Manipulator.SubWidgets;
 public class UIBackgroundSeperator : Separator

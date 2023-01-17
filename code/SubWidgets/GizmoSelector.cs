@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Manipulator.Gizmo;
 using Sandbox;
-using Tools;
+using Editor;
 
 namespace Manipulator.SubWidgets;
 
