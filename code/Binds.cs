@@ -19,6 +19,7 @@ public class Binds
 	public KeyCode RotationGizmo { get; set; }
 	public KeyCode ScaleGizmo { get; set; }
 	public KeyCode ToggleLocalManipulation { get; set; }
+	public KeyCode TogglePivotManipulation { get; set; }
 
 	public void ResetToDefaults()
 	{
@@ -34,6 +35,7 @@ public class Binds
 		RotationGizmo = KeyCode.R;
 		ScaleGizmo = KeyCode.E;
 		ToggleLocalManipulation = KeyCode.C;
+		TogglePivotManipulation = KeyCode.X;
 	}
 
 	public static Binds Load()

@@ -11,10 +11,7 @@ namespace Manipulator.SubWidgets;
 public class LocalSelector : Selector
 {
 	private ManipulatorWidget Manipulator { get; set; }
-
-	private int globalButtonIndex;
-	private int localButtonIndex;
-
+	
 	private SelectorButton globalButton;
 	private SelectorButton localButton;
 
@@ -39,11 +36,6 @@ public class LocalSelector : Selector
 
 		AddButton( globalButton );
 		AddButton( localButton );
-	}
-
-	public void OnActivate()
-	{
-
 	}
 
 	public override void OnButtonClicked( SelectorButton button )

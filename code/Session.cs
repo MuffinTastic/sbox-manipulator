@@ -34,6 +34,7 @@ public partial class Session : RenderHook, IDisposable, IValid
 		Camera.EnablePostProcessing = true;
 		Camera.BackgroundColor = Color.Black;
 
+		Selection = new Selection( this );
 		SetGizmo( GizmoUIAttribute.All.First() );
 
 		// Session

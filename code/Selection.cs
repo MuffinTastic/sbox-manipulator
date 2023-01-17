@@ -11,6 +11,8 @@ namespace Manipulator;
 /// 
 public class Selection : IValid
 {
+	private Session Session;
+
 	private Vector3 _position;
 	private Rotation _rotation;
 	private float _scale;
@@ -52,6 +54,11 @@ public class Selection : IValid
 	public HashSet<IEntity> SelectedEntities = new();
 	public List<ValueTuple<IEntity, Transform>> LocalTransforms = new();
 
+	public Selection( Session session )
+	{
+		Session = session;
+	}
+
 	public void Add( IEntity entity )
 	{
 		if ( entity.IsWorld() )
@@ -61,7 +68,7 @@ public class Selection : IValid
 		{
 			SelectedEntities.Add( entity );
 
-			RebuildTransforms();
+			RebuildTransforms( resetPivot: true );
 
 			OnUpdated?.Invoke();
 		}
@@ -76,7 +83,7 @@ public class Selection : IValid
 		{
 			SelectedEntities.Remove( entity );
 			
-			RebuildTransforms();
+			RebuildTransforms( resetPivot: true );
 
 			OnUpdated?.Invoke();
 		}
@@ -122,10 +129,12 @@ public class Selection : IValid
 	{
 		var removed = SelectedEntities.RemoveWhere( entity => !entity.IsValid() );
 		if ( removed != 0 )
-			RebuildTransforms();
+			RebuildTransforms( resetPivot: true );
 	}
 
-	public void RebuildTransforms()
+	private Vector3 _pivotOffset = 0.0f;
+
+	public void RebuildTransforms( bool resetPivot = false )
 	{
 		LocalTransforms.Clear();
 
@@ -134,27 +143,50 @@ public class Selection : IValid
 			return;
 		}
 
-		var averagePosition = Vector3.Zero;
+		var resetCenter = Vector3.Zero;
 
 		foreach ( var entity in SelectedEntities )
 		{
-			averagePosition += entity.Transform.Position;
+			resetCenter += entity.Transform.Position;
 		}
 
-		averagePosition /= SelectedEntities.Count;
+		resetCenter /= SelectedEntities.Count;
 		
-		_position = averagePosition;
+		if ( resetPivot )
+		{
+			_position = resetCenter;
+		}
+		else if ( !Session.PivotManipulation )
+		{
+			_position = resetCenter + _pivotOffset;
+		}
+
 		_rotation = Rotation.Identity;
 		_scale = 1.0f;
+
+		_pivotOffset = _position - resetCenter;
+
 		var selectionTransform = new Transform( _position, _rotation, _scale );
 
 		foreach ( var entity in SelectedEntities )
 		{
-			LocalTransforms.Add( (entity.GetServerEntity(), selectionTransform.ToLocal( entity.Transform ).WithScale( entity.Transform.Scale ) ) );
+			LocalTransforms.Add( ( entity.GetServerEntity(), selectionTransform.ToLocal( entity.Transform ).WithScale( entity.Transform.Scale ) ) );
 		}
 	}
 
-	public void OnTransformChanged()
+	private void OnTransformChanged()
+	{
+		if ( Session.PivotManipulation )
+		{
+			RebuildTransforms();
+		}
+		else
+		{
+			UpdateSelected();
+		}
+	}
+
+	public void UpdateSelected()
 	{
 		var selectionTransform = new Transform( _position, _rotation, _scale );
 

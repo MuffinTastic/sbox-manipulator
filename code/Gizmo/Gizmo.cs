@@ -125,7 +125,7 @@ public abstract class Gizmo : IDisposable
 		}
 		else
 		{
-			Selection.OnTransformChanged();
+			Selection.UpdateSelected();
 		}
 
 		foreach ( var gizmo in SubGizmos )

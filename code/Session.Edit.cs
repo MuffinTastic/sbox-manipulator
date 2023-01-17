@@ -12,8 +12,9 @@ public partial class Session
 	public IEntity HoverEntity { get; private set; }
 
 	public bool LocalManipulation { get; private set; } = false;
+	public bool PivotManipulation { get; private set; } = false;
 
-	public Selection Selection = new();
+	public Selection Selection;
 
 	public Gizmo.Gizmo Gizmo { get; private set; }
 
@@ -51,6 +52,8 @@ public partial class Session
 				}
 
 				Selection.SetEditorInspector();
+
+				SetPivotManipulation( false );
 			}
 		}
 	}
@@ -111,6 +114,11 @@ public partial class Session
 			Gizmo.UpdateDrag( GetCursorRay() );
 		}
 
+		if ( e.Key == Binds.TogglePivotManipulation )
+		{
+			SetPivotManipulation( !PivotManipulation );
+		}
+
 		if ( e.Key == Binds.TranslationGizmo )
 		{
 			SetGizmo( GizmoUIAttribute.For( typeof( TranslationGizmo ) ) );
@@ -137,17 +145,32 @@ public partial class Session
 
 	public event Action<int> OnGizmoUpdated;
 	public event Action<bool> OnLocalManipulationUpdated;
+	public event Action<bool> OnPivotManipulationUpdated;
 
-	public void SetGizmo( GizmoUIAttribute attribute )
+	public void SetGizmo( GizmoUIAttribute attribute, bool exitPivotManipulation = true )
 	{
 		Gizmo = attribute.CreateGizmo( this, Selection );
 		OnGizmoUpdated?.Invoke( attribute.Index );
+
+		if ( exitPivotManipulation )
+			SetPivotManipulation( false );
 	}
 
 	public void SetLocalManipulation( bool on )
 	{
 		LocalManipulation = on;
 		OnLocalManipulationUpdated?.Invoke( on );
+	}
+
+	public void SetPivotManipulation( bool on )
+	{
+		PivotManipulation = on;
+		OnPivotManipulationUpdated?.Invoke( on );
+
+		if ( PivotManipulation )
+		{
+			SetGizmo( GizmoUIAttribute.For( typeof( TranslationGizmo ) ), exitPivotManipulation: false );
+		}
 	}
 
 	public void ResetUIListeners()

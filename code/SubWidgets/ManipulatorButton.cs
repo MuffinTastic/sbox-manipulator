@@ -36,6 +36,8 @@ public class ManipulatorButton : Widget
 	{
 		if ( e.LeftMouseButton )
 		{
+			if ( IsToggle )
+				Checked = !Checked;
 			Clicked?.Invoke();
 			e.Accepted = true;
 			return;

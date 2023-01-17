@@ -28,6 +28,13 @@ public partial class TranslationGizmo : Gizmo
 		{
 			Dragged.PreRender( Session );
 			Dragged.Render();
+
+			var centerGizmo = SubGizmos[0];
+			if ( Session.PivotManipulation && Dragged != centerGizmo )
+			{
+				centerGizmo.PreRender( Session );
+				centerGizmo.Render();
+			}
 		}
 		else
 		{

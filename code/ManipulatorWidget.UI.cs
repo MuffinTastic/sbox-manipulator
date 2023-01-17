@@ -20,6 +20,7 @@ public partial class ManipulatorWidget
 
 	private GizmoSelector GizmoSelector;
 	private LocalSelector LocalSelector;
+	private ManipulatorButton PivotToggle;
 
 	[Event.Hotload]
 	private void BuildUI()
@@ -53,6 +54,14 @@ public partial class ManipulatorWidget
 				leftBackground.Layout.Add( new UIBackgroundSeperator() );
 				LocalSelector = new LocalSelector( top, this );
 				leftBackground.Layout.Add( LocalSelector );
+				leftBackground.Layout.Add( new UIBackgroundSeperator() );
+				PivotToggle = new ManipulatorButton( this );
+				PivotToggle.Icon = "my_location";
+				PivotToggle.IsToggle = true;
+				PivotToggle.ToolTip = "Toggle pivot manipulation";
+				PivotToggle.StatusTip = PivotToggle.ToolTip;
+				PivotToggle.Clicked += () => Session.SetPivotManipulation( PivotToggle.Checked );
+				leftBackground.Layout.Add( PivotToggle );
 			}
 
 			Hideables.Add( leftBackground );
@@ -103,6 +112,7 @@ public partial class ManipulatorWidget
 		{
 			Session.OnGizmoUpdated += GizmoSelector.OnGizmoSet;
 			Session.OnLocalManipulationUpdated += LocalSelector.OnLocalManipulationSet;
+			Session.OnPivotManipulationUpdated += ( on ) => PivotToggle.Checked = on;
 			GizmoSelector.OnActivate();
 
 			foreach ( var widget in Hideables )

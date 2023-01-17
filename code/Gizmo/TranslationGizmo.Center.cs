@@ -76,5 +76,13 @@ public partial class TranslationGizmo
 		{
 			return new Plane( origin, Parent.AxisToVector( Axis.Camera ) );
 		}
+
+		public override Color GetGizmoColor()
+		{
+			if ( Parent.Session.PivotManipulation )
+				return Color.Magenta.Desaturate( 0.1f );
+
+			return base.GetGizmoColor();
+		}
 	}
 }
