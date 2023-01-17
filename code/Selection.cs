@@ -203,6 +203,6 @@ public class Selection : IValid
 			entity.ResetInterpolation();
 		}
 
-		_pivotOffset = _rotation * _pivotOffsetInit;
+		_pivotOffset = _rotation * (_pivotOffsetInit * _scale);
 	}
 }
