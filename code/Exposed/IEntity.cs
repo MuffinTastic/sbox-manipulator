@@ -34,49 +34,7 @@ public static class IEntityExtensions
 		return className == "WorldEntity";
 	}
 
-	public static void SetTransform( this IEntity ent, Transform transform )
-	{
-		if ( ent is null )
-			return;
-
-		var type = ent.GetType();
-		var transformProp = type.GetProperty( "Transform", BindingFlags.Instance | BindingFlags.Public );
-
-		if ( transformProp is null )
-			return;
-
-		try
-		{
-			transformProp.SetValue( ent, transform );
-		}
-		catch ( NullReferenceException nre )
-		{
-			Log.Error( nre );
-		}
-	}
-
-	public static void SetVelocity( this IEntity ent, Vector3 velocity )
-	{
-		if ( ent is null )
-			return;
-
-		var type = ent.GetType();
-		var velocityProp = type.GetProperty( "Velocity", BindingFlags.Instance | BindingFlags.Public );
-
-		if ( velocityProp is null )
-			return;
-
-		try
-		{
-			velocityProp.SetValue( ent, velocity );
-		}
-		catch ( NullReferenceException nre )
-		{
-			Log.Error( nre );
-		}
-	}
-
-	public static void ResetInterpolation( this IEntity ent )
+	public static void TryResetInterpolation( this IEntity ent )
 	{
 		if ( ent is null )
 			return;
@@ -94,28 +52,6 @@ public static class IEntityExtensions
 		catch ( NullReferenceException nre )
 		{
 			Log.Error( nre );
-		}
-	}
-
-	public static bool IsValid( this IEntity ent )
-	{
-		if ( ent is null )
-			return false;
-
-		var type = ent.GetType();
-		var isValidProperty = type.GetProperty( "IsValid", BindingFlags.Instance | BindingFlags.Public );
-
-		if ( isValidProperty is null )
-			return false;
-
-		try
-		{
-			return (bool) isValidProperty.GetValue( ent, null );
-		}
-		catch ( NullReferenceException nre )
-		{
-			Log.Error( nre );
-			return false;
 		}
 	}
 

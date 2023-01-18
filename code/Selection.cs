@@ -198,9 +198,10 @@ public class Selection : IValid
 			localTransform.Position *= selectionTransform.Scale;
 			
 			var worldTransform = selectionTransform.ToWorld( localTransform ).WithScale( localTransform.Scale * selectionTransform.Scale );
-			entity.SetTransform( worldTransform );
-			entity.SetVelocity( 0.0f );
-			entity.ResetInterpolation();
+			entity.Position = worldTransform.Position;
+			entity.Rotation = worldTransform.Rotation;
+			entity.Velocity = 0.0f;
+			entity.TryResetInterpolation();
 		}
 
 		_pivotOffset = _rotation * (_pivotOffsetInit * _scale);
