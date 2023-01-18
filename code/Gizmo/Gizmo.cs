@@ -44,6 +44,8 @@ public abstract class Gizmo : IDisposable
 			DragStartTransform = GetSelectionTransform();
 
 			Dragged.StartDrag( ray );
+
+			Selection.StartDrag();
 		}
 
 		return IsDragging;
@@ -63,6 +65,8 @@ public abstract class Gizmo : IDisposable
 			return;
 
 		Dragged = null;
+
+		Selection.StopDrag();
 	}
 
 	public void ResetDragStartTransform()

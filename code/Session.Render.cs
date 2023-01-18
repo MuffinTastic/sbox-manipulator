@@ -9,7 +9,7 @@ public partial class Session
 	{
 		foreach ( var ent in EntityEntry.All )
 		{
-			var so = ent.Client?.ExposedGetSceneObject();
+			var so = ent.Client?.TryGetSceneObject();
 
 			if ( so.IsValid() )
 			{

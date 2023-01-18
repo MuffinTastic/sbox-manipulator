@@ -9,7 +9,7 @@ using Sandbox;
 
 public static class IEntityExtensions
 {
-	public static SceneObject ExposedGetSceneObject( this IEntity ent )
+	public static SceneObject TryGetSceneObject( this IEntity ent )
 	{
 		if ( ent is null )
 			return null;
@@ -55,18 +55,56 @@ public static class IEntityExtensions
 		}
 	}
 
-	private static Dictionary<IEntity, IEntity> ClientToServer = new();
-
-	public static IEntity GetServerEntity( this IEntity clientEntity )
+	public static bool? TryGetPhysicsEnabled( this IEntity ent )
 	{
-		if ( ClientToServer.TryGetValue( clientEntity, out IEntity serverEntity ) )
+		if ( ent is null )
+			return null;
+
+		var type = ent.GetType();
+		var physicsEnabledProp = type.GetProperty( "PhysicsEnabled", BindingFlags.Instance | BindingFlags.Public );
+
+		if ( physicsEnabledProp is null )
+			return null;
+
+		Log.Info( physicsEnabledProp );
+
+		var physicsEnabled = physicsEnabledProp.GetValue( ent );
+		return (bool) physicsEnabled;
+	}
+
+	public static void SetPhysicsEnabled( this IEntity ent, bool enabled )
+	{
+		if ( ent is null )
+			return;
+
+		var type = ent.GetType();
+		var physicsEnabledProp = type.GetProperty( "PhysicsEnabled", BindingFlags.Instance | BindingFlags.Public );
+
+		if ( physicsEnabledProp is null )
+			return;
+
+		try
+		{
+			physicsEnabledProp.SetValue( ent, enabled );
+		}
+		catch ( NullReferenceException nre )
+		{
+			Log.Error( nre );
+		}
+	}
+
+	private static Dictionary<IEntity, IEntity> ServerEntities = new();
+
+	public static IEntity GetServerEntity( this IEntity entity )
+	{
+		if ( ServerEntities.TryGetValue( entity, out IEntity serverEntity ) )
 		{
 			return serverEntity;
 		}
 		else
 		{
-			serverEntity = EntityEntry.All.Where( e => e.Client == clientEntity ).FirstOrDefault()?.Server;
-			ClientToServer.Add( clientEntity, serverEntity );
+			serverEntity = EntityEntry.All.Where( e => e.Client == entity || e.Server == entity ).FirstOrDefault()?.Server;
+			ServerEntities.Add( entity, serverEntity );
 			return serverEntity;
 		}
 	}

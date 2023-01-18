@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Sandbox;
 using Editor;
+using Sandbox.Internal;
 
 namespace Manipulator;
 
@@ -52,7 +53,15 @@ public class Selection : IValid
 	public event Action OnUpdated;
 
 	public HashSet<IEntity> SelectedEntities = new();
-	public List<ValueTuple<IEntity, Transform>> LocalTransforms = new();
+
+	private List<ValueTuple<IEntity, Transform>> LocalTransforms = new();
+
+	private struct PreDragState
+	{
+		public bool? PhysicsEnabled;
+	}
+	
+	private List<ValueTuple<IEntity, PreDragState>> PreDragStates = new();
 
 	public Selection( Session session )
 	{
@@ -102,6 +111,7 @@ public class Selection : IValid
 	{
 		SelectedEntities.Clear();
 		LocalTransforms.Clear();
+		PreDragStates.Clear();
 
 		if ( !suppress )
 			OnUpdated?.Invoke();
@@ -130,6 +140,8 @@ public class Selection : IValid
 		var removed = SelectedEntities.RemoveWhere( entity => !entity.IsValid() );
 		if ( removed != 0 )
 			RebuildTransforms( resetPivot: true );
+
+		PreDragStates.RemoveAll( pair => !pair.Item1.IsValid() );
 	}
 
 	private Vector3 _pivotOffsetInit = 0.0f;
@@ -205,5 +217,47 @@ public class Selection : IValid
 		}
 
 		_pivotOffset = _rotation * (_pivotOffsetInit * _scale);
+	}
+
+	public void StartDrag()
+	{
+		PreDragStates.Clear();
+
+		foreach ( var entity in SelectedEntities )
+		{
+			var serverEntity = entity.GetServerEntity();
+			var isPawn = serverEntity.Client?.Pawn == serverEntity;
+
+			bool? physicsEnabled = null;
+
+			// setting physics on a pawn fucks everything up, at least in the sandbox gamemode
+			// let's avoid that
+			if ( !isPawn && serverEntity.TryGetPhysicsEnabled() is bool enabled )
+			{
+				physicsEnabled = enabled;
+				serverEntity.SetPhysicsEnabled( false );
+			}
+
+			var state = new PreDragState
+			{
+				PhysicsEnabled = physicsEnabled
+			};
+
+			PreDragStates.Add( (serverEntity, state) );
+		}
+	}
+
+	public void StopDrag()
+	{
+		foreach ( var pair in PreDragStates )
+		{
+			var serverEntity = pair.Item1;
+			var state = pair.Item2;
+
+			if ( state.PhysicsEnabled is bool physicsEnabled )
+			{
+				serverEntity.SetPhysicsEnabled( physicsEnabled );
+			}
+		}
 	}
 }

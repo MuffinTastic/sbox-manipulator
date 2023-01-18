@@ -25,7 +25,7 @@ namespace Exposed
 			var all = All.Where( w => !w.ExposedIsTransient() && w.ExposedHandleValid() ).ToList();
 
 			// A valid sceneobject pointer from the game sceneworld
-			var testPointer = EntityEntry.All.Select( e => e.Client.ExposedGetSceneObject().ExposedGetPointer() ).Where( e => e is not null ).FirstOrDefault();
+			var testPointer = EntityEntry.All.Select( e => e.Client.TryGetSceneObject().ExposedGetPointer() ).Where( e => e is not null ).FirstOrDefault();
 
 			if ( testPointer is not null )
 			{

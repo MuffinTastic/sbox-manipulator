@@ -54,7 +54,7 @@ public class Outlines : IValid
 			if ( entity is null )
 				continue;
 
-			var sceneModel = entity.ExposedGetSceneObject();
+			var sceneModel = entity.TryGetSceneObject();
 			var model = sceneModel?.Model;
 			if ( model is not null )
 			{
@@ -89,7 +89,7 @@ public class Outlines : IValid
 		List<ushort> localBBoxIndices = new();
 		List<ushort> totalBBoxIndices = new();
 
-		var sceneModel = entity.ExposedGetSceneObject();
+		var sceneModel = entity.TryGetSceneObject();
 		var model = sceneModel?.Model;
 		if ( model is not null )
 		{ 
