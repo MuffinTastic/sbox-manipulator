@@ -210,9 +210,8 @@ public class Selection : IValid
 			localTransform.Position *= selectionTransform.Scale;
 			
 			var worldTransform = selectionTransform.ToWorld( localTransform ).WithScale( localTransform.Scale * selectionTransform.Scale );
-			entity.Position = worldTransform.Position;
-			entity.Rotation = worldTransform.Rotation;
-			entity.Velocity = 0.0f;
+			entity.SetTransform( worldTransform );
+			entity.SetVelocity( 0.0f );
 			entity.TryResetInterpolation();
 		}
 
