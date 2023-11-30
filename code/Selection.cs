@@ -77,7 +77,8 @@ public class Selection : IValid
 		{
 			SelectedEntities.Add( entity );
 
-			RebuildTransforms( resetPivot: true );
+			UpdatePivot( reset: true );
+			RebuildTransforms();
 
 			OnUpdated?.Invoke();
 		}
@@ -91,8 +92,9 @@ public class Selection : IValid
 		if ( SelectedEntities.Contains( entity ) )
 		{
 			SelectedEntities.Remove( entity );
-			
-			RebuildTransforms( resetPivot: true );
+
+			UpdatePivot( reset: true );
+			RebuildTransforms();
 
 			OnUpdated?.Invoke();
 		}
@@ -139,7 +141,10 @@ public class Selection : IValid
 	{
 		var removed = SelectedEntities.RemoveWhere( entity => !entity.IsValid() );
 		if ( removed != 0 )
-			RebuildTransforms( resetPivot: true );
+		{
+			UpdatePivot( reset: true );
+			RebuildTransforms();
+		}
 
 		PreDragStates.RemoveAll( pair => !pair.Item1.IsValid() );
 	}
@@ -147,10 +152,8 @@ public class Selection : IValid
 	private Vector3 _pivotOffsetInit = 0.0f;
 	private Vector3 _pivotOffset = 0.0f;
 
-	public void RebuildTransforms( bool resetPivot = false )
+	public void UpdatePivot( bool reset = false )
 	{
-		LocalTransforms.Clear();
-
 		if ( !SelectedEntities.Any() )
 		{
 			return;
@@ -164,8 +167,8 @@ public class Selection : IValid
 		}
 
 		resetCenter /= SelectedEntities.Count;
-		
-		if ( resetPivot )
+
+		if ( reset )
 		{
 			_position = resetCenter;
 		}
@@ -178,12 +181,22 @@ public class Selection : IValid
 		_scale = 1.0f;
 
 		_pivotOffsetInit = _pivotOffset = _position - resetCenter;
+	}
+
+	public void RebuildTransforms()
+	{
+		LocalTransforms.Clear();
+
+		if ( !SelectedEntities.Any() )
+		{
+			return;
+		}
 
 		var selectionTransform = new Transform( _position, _rotation, _scale );
 
 		foreach ( var entity in SelectedEntities )
 		{
-			LocalTransforms.Add( ( entity.GetServerEntity(), selectionTransform.ToLocal( entity.Transform ).WithScale( entity.Transform.Scale ) ) );
+			LocalTransforms.Add( ( entity.GetServerEntity(), selectionTransform.ToLocal( entity.Transform ).WithScale( entity.Transform.Scale / _scale ) ) );
 		}
 	}
 
@@ -191,6 +204,7 @@ public class Selection : IValid
 	{
 		if ( Session.PivotManipulation )
 		{
+			UpdatePivot();
 			RebuildTransforms();
 		}
 		else
@@ -221,6 +235,7 @@ public class Selection : IValid
 	public void StartDrag()
 	{
 		PreDragStates.Clear();
+		RebuildTransforms();
 
 		foreach ( var entity in SelectedEntities )
 		{

@@ -69,14 +69,6 @@ public abstract class Gizmo : IDisposable
 		Selection.StopDrag();
 	}
 
-	public void ResetDragStartTransform()
-	{
-		if ( IsDragging )
-		{
-			DragStartTransform = GetSelectionTransform();
-		}
-	}
-
 	public bool IsHovering( Ray ray )
 	{
 		if ( !Session.ShouldInteract() )
@@ -125,6 +117,7 @@ public abstract class Gizmo : IDisposable
 
 		if ( !IsDragging )
 		{
+			Selection.UpdatePivot();
 			Selection.RebuildTransforms();
 		}
 		else
@@ -213,6 +206,14 @@ public abstract class Gizmo : IDisposable
 		}
 
 		return Vector3.Zero;
+	}
+
+	public void ResetDragStartTransform()
+	{
+		if ( IsDragging )
+		{
+			DragStartTransform = GetSelectionTransform();
+		}
 	}
 
 	public Transform GetDragTransform()
