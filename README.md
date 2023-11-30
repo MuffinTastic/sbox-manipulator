@@ -15,8 +15,4 @@ Secret sauce:
 
 It was made for an older version of s&box and no longer works with the latest engine APIs, so here's a few videos:
 
-<video src='https://raw.githubusercontent.com/MuffinTastic/sbox-manipulator/master/media/sbox-dev_C0Wkg8HZCn.mp4' width=720></video>
-
-<video src='https://raw.githubusercontent.com/MuffinTastic/sbox-manipulator/master/media/sbox-dev_LG5iDH01Fa.mp4' width=720></video>
-
-<video src='https://raw.githubusercontent.com/MuffinTastic/sbox-manipulator/master/media/sbox-dev_zx6axwhfzM.mp4' width=720></video>
+[![Video playlist](https://i.ytimg.com/vi/xnTNiqt4_CA/maxresdefault.jpg)](https://www.youtube.com/playlist?list=PLexWV3KyRjzHtXmqAkdQ-mhwzc3-VT46x)
