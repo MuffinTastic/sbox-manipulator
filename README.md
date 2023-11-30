@@ -14,6 +14,6 @@ Secret sauce:
 - Uses simple custom shaders for gizmos
 
 It was made for an older version of s&box and no longer works with the latest engine APIs, so here's a few videos:
-![demo1](media/sbox-dev_C0Wkg8HZCn.mp4)
-![demo2](media/sbox-dev_LG5iDH01Fa.mp4)
-![demo3](media/sbox-dev_zx6axwhfzM.mp4)
+![Demo 1](https://raw.githubusercontent.com/MuffinTastic/sbox-manipulator/master/media/sbox-dev_C0Wkg8HZCn.mp4)
+![Demo 2](https://raw.githubusercontent.com/MuffinTastic/sbox-manipulator/master/media/sbox-dev_LG5iDH01Fa.mp4)
+![Demo 3](https://raw.githubusercontent.com/MuffinTastic/sbox-manipulator/master/media/sbox-dev_zx6axwhfzM.mp4)
