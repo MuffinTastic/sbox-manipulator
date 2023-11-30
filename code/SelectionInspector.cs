@@ -62,6 +62,7 @@ public partial class SelectionInspector : ScrollArea
 
 			sheet.AddProperty( Selection, "Position" );
 			sheet.AddProperty( Selection, "Rotation" );
+			sheet.AddProperty( Selection, "Scale" );
 		}
 
 		/*
